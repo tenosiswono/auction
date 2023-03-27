@@ -19,15 +19,17 @@ model Example {
 model Auction {
   id            String   @id @default(cuid())
   title         String
-  description   String
-  startingPrice Int
+  description   String   @db.Text
+  startingPrice Int      @default(0)
   currentPrice  Int      @default(0)
+  duration      Int      @default(0)
   startDate     DateTime
   endDate       DateTime
+  createdAt     DateTime @default(now())
   creatorId     String // user ID of the creator
   creator       User     @relation("AuctionCreator", fields: [creatorId], references: [id])
   bids          Bid[]
-  status        String   @default("active") // status of the auction: active, ended, canceled
+  status        String   @default("active") // status of the auction: draft, active, ended, canceled
   winnerId      String? // user ID of the winner
   winner        User?    @relation("AuctionWinner", fields: [winnerId], references: [id])
 }
@@ -58,12 +60,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -83,7 +85,8 @@ model User {
   name             String?
   email            String?          @unique
   emailVerified    DateTime?
-  image            String?
+  image            String?          @db.Text
+  password         String
   accounts         Account[]
   sessions         Session[]
   deposit          Int              @default(0) // deposit balance of user
