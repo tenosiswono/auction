@@ -1,9 +1,15 @@
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { TbHammer, TbHandStop, TbPigMoney, TbBookmarks } from "react-icons/tb";
+import {
+  TbHammer,
+  TbHandStop,
+  TbPigMoney,
+  TbBookmarks,
+  TbLogout,
+} from "react-icons/tb";
 import { api } from "~/utils/api";
 
 export default function Layout({
@@ -30,6 +36,9 @@ export default function Layout({
     setBallance(depositBallance.data?.deposit || 0);
   }, [depositBallance.data]);
 
+  const onSignout = async () => {
+    await signOut()
+  }
   return (
     <>
       <Head>
@@ -69,7 +78,7 @@ export default function Layout({
         >
           <div className="flex h-full flex-col overflow-y-auto bg-orange-50 p-4">
             <ul className="space-y-2 font-medium">
-              <li className="mb-8 flex flex-col justify-center items-center">
+              <li className="mb-8 flex flex-col items-center justify-center">
                 <Image
                   src="/logo.png"
                   width={72}
@@ -171,6 +180,15 @@ export default function Layout({
                       <span className="ml-3">Deposit Histories</span>
                     </a>
                   </li>
+                  <li>
+                    <button
+                      onClick={onSignout}
+                      className="w-full flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                    >
+                      <TbLogout size={24} />
+                      <span className="ml-3">Signout</span>
+                    </button>
+                  </li>
                 </>
               )}
             </ul>
@@ -190,7 +208,7 @@ export default function Layout({
             </div>
           </div>
         </aside>
-        <div className="h-screen bg-slate-50 p-12 sm:ml-64 md:p-24 main-container">
+        <div className="main-container h-screen bg-slate-50 p-12 sm:ml-64 md:p-24">
           {children}
         </div>
       </main>
