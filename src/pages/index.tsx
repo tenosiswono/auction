@@ -5,34 +5,63 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import Layout from "~/components/Layout/Layout";
 
+const HOWS = [
+  {
+    title: "Player Deposits Required",
+    description:
+      "In order to participate in the auction, each user is required to make a deposit.",
+  },
+  {
+    title: "5 Second Bidding Intervals",
+    description:
+      "Bid with confidence knowing that each bid is spaced out with a 5 second interval.",
+  },
+  {
+    title: "No Minimum Bid Price",
+    description:
+      "Bid any amount that is higher than the current price and increase your chances of winning the auction.",
+  },
+  {
+    title: "Winner Announced at Auction Close",
+    description:
+      "The winner will be announced at the end of the auction timer.",
+  },
+];
+
 const Home: NextPage = () => {
   return (
-    <Layout title={"Auction"} description={"Auction"} >
-      <h1 className="text-5xl font-extrabold tracking-tight text-gray-400 sm:text-[5rem]">
-        Auction Online
-      </h1>
-      <div className="flex flex-col items-center gap-2">
-        <AuthShowcase />
+    <Layout title={"Auction"} description={"Auction"}>
+      <div className="mb-12">
+        <h3 className="text-md mb-4 font-medium text-gray-600">
+          Join the hive and become a top bidder. Discover a new world of
+          exciting auctions
+        </h3>
+        <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-800 md:text-5xl lg:text-6xl mb-4">
+          Bee the highest bidder with
+        </h1>
+        <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-800 md:text-5xl lg:text-6xl">
+          Auction<span className="text-orange-400">Hive</span>
+        </h1>
+      </div>
+      <div className="mb-12">
+        <h4 className="text-md mb-4 font-bold text-gray-800">How its Works</h4>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          {HOWS.map((how, index) => (
+            <div
+              className="rounded-lg bg-white p-4 shadow-md"
+              key={`how-${index}`}
+            >
+              <h2 className="text-md mb-2 font-semibold">{how.title}</h2>
+              <p className="text-sm text-gray-600">{how.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mb-12">
+        <h4 className="text-md mb-4 font-bold text-gray-800">Featured Auctions</h4>
       </div>
     </Layout>
   );
 };
 
 export default Home;
-
-const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession();
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-gray-400">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-      </p>
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-gray-400 no-underline transition hover:bg-white/20"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};

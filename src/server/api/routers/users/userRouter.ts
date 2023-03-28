@@ -1,3 +1,4 @@
+import { type User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import {
@@ -5,18 +6,16 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+import { observable } from "@trpc/server/observable";
+import { removeProperties } from "~/utils/api";
 
 export const userRouter = createTRPCRouter({
   updateUser: protectedProcedure
     .input(
       z
         .object({
-          // username: z.string(),
           name: z.string().trim().min(3).nullish(),
-          bio: z.string().nullish(),
-          website: z.string().nullish(),
-          bgImage: z.string().nullish(),
-          profileImage: z.string().nullish(),
+          image: z.string().nullish(),
         })
         .refine((obj) => {
           if (
@@ -34,8 +33,27 @@ export const userRouter = createTRPCRouter({
           ...input,
         },
       });
-      return { success: true, user };
+      return { success: true, user: removeProperties(user) };
     }),
+  getDepositBallance: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.prisma.user.findFirst({
+      where: { id: ctx.session.user.id },
+    });
+    return { success: true, deposit: user?.deposit };
+  }),
+  onDepositChange: protectedProcedure.subscription(({ctx}) => {
+    return observable<User>((emit) => {
+      const onDepositChange = (data: User) => {
+        if (data.id === ctx.session.user.id) {
+          emit.next(removeProperties(data));
+        }
+      };
+      ctx.ee.on('onDepositChange', onDepositChange);
+      return () => {
+        ctx.ee.off('add', onDepositChange);
+      };
+    })
+  }),
   createUser: publicProcedure
     .input(
       z
@@ -84,19 +102,15 @@ export const userRouter = createTRPCRouter({
 
         return {
           success: true,
-          data: user,
+          data:  removeProperties(user) ,
         };
       }
-      if (existingUser) {
-        throw new z.ZodError([
-          {
-            path: ["email"],
-            message: "Email already registered",
-            code: "custom",
-          },
-        ]);
-      }
-
-      return { success: true, data: "no" };
+      throw new z.ZodError([
+        {
+          path: ["email"],
+          message: "Email already registered",
+          code: "custom",
+        },
+      ]);
     }),
 });

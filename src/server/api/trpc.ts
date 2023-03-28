@@ -19,10 +19,13 @@ import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import { EventEmitter } from 'events';
 
 type CreateContextOptions = {
   session: Session | null;
 };
+
+export const ee = new EventEmitter();
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -38,6 +41,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    ee,
   };
 };
 
@@ -128,3 +132,4 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+

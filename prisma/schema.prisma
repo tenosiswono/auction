@@ -29,7 +29,7 @@ model Auction {
   creatorId     String // user ID of the creator
   creator       User     @relation("AuctionCreator", fields: [creatorId], references: [id])
   bids          Bid[]
-  status        String   @default("active") // status of the auction: draft, active, ended, canceled
+  status        String   @default("active") // status of the auction: draft, active, completed, cancelled
   winnerId      String? // user ID of the winner
   winner        User?    @relation("AuctionWinner", fields: [winnerId], references: [id])
 }

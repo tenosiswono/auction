@@ -2,19 +2,34 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { TbHammer } from "react-icons/tb";
+import React, { useEffect, useState } from "react";
+import { TbHammer, TbHandStop, TbPigMoney, TbBookmarks } from "react-icons/tb";
+import { api } from "~/utils/api";
 
 export default function Layout({
   children,
-  title,
-  description,
+  title = "AuctionHive",
+  description = "Bee the highest bidder with AuctionHive.",
 }: {
   children: React.ReactNode;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 }) {
   const { data: sessionData, status } = useSession();
+
+  const [ballance, setBallance] = useState<number>(0);
+
+  const depositBallance = api.user.getDepositBallance.useQuery();
+  api.user.onDepositChange.useSubscription(undefined, {
+    onData(data) {
+      setBallance(data.deposit);
+    },
+  });
+
+  useEffect(() => {
+    setBallance(depositBallance.data?.deposit || 0);
+  }, [depositBallance.data]);
+
   return (
     <>
       <Head>
@@ -49,18 +64,22 @@ export default function Layout({
 
         <aside
           id="sidebar-multi-level-sidebar"
-          className="fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full transition-transform sm:translate-x-0"
+          className="fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full transition-transform sm:translate-x-0"
           aria-label="Sidebar"
         >
           <div className="flex h-full flex-col overflow-y-auto bg-orange-50 p-4">
-            <ul className="space-y-4 font-medium">
-              <li className="mb-8 flex justify-center">
+            <ul className="space-y-2 font-medium">
+              <li className="mb-8 flex flex-col justify-center items-center">
                 <Image
                   src="/logo.png"
-                  width={150}
-                  height={94}
+                  width={72}
+                  height={72}
                   alt="AuctionHive"
                 />
+
+                <h1 className="mt-4 text-3xl font-extrabold leading-none tracking-tight text-gray-800">
+                  Auction<span className="text-orange-400">Hive</span>
+                </h1>
               </li>
               <li>
                 <a
@@ -76,20 +95,83 @@ export default function Layout({
                   <div className="flex flex-row">
                     <Link
                       href="/auth/signup"
-                      className="mr-4 flex-1 btn btn-primary"
+                      className="btn btn-primary mr-4 flex-1"
                     >
                       Signup
                     </Link>
                     <Link
                       href="/auth/signin"
-                      className="flex-1 rounded-lg btn btn-secondary"
+                      className="btn btn-secondary flex-1 rounded-lg"
                     >
                       Signin
                     </Link>
                   </div>
                 </li>
               ) : (
-                <li></li>
+                <>
+                  <li>
+                    <a
+                      href="#"
+                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                    >
+                      <TbBookmarks size={24} />
+                      <span className="ml-3">Bidded Auctions</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                    >
+                      <TbHandStop size={24} />
+                      <span className="ml-3">My Auctions</span>
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/auth/signup" className="btn btn-primary block">
+                      Start a new auction
+                    </Link>
+                  </li>
+                  <li>
+                    <div className="flex items-center">
+                      <hr className="border-1 mr-4 w-full border-gray-400" />
+                      <div className="text-centerm text-sm font-bold text-gray-400">
+                        ACCOUNT
+                      </div>
+                      <hr className="border-1 ml-4 w-full border-gray-400" />
+                    </div>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                    >
+                      <Image
+                        className="h-6 w-6 rounded-full"
+                        width={24}
+                        height={24}
+                        src={
+                          sessionData.user.image || "/img/default-avatar.webp"
+                        }
+                        alt={sessionData.user.email || "avatar"}
+                      />
+                      <span className="ml-3 flex-1">My Profile</span>
+                      <span>${ballance}</span>
+                      <button className="btn-primary ml-2 h-6 w-6 rounded-full p-0">
+                        +
+                      </button>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                    >
+                      <TbPigMoney size={24} />
+                      <span className="ml-3">Deposit Histories</span>
+                    </a>
+                  </li>
+                </>
               )}
             </ul>
             <div className="flex-1"></div>
@@ -108,7 +190,9 @@ export default function Layout({
             </div>
           </div>
         </aside>
-        <div className="p-20 sm:ml-64">{children}</div>
+        <div className="h-screen bg-slate-50 p-12 sm:ml-64 md:p-24 main-container">
+          {children}
+        </div>
       </main>
     </>
   );
