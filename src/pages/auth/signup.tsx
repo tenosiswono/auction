@@ -1,9 +1,8 @@
-import { TRPCClientError } from "@trpc/client";
 import { useSession } from "next-auth/react";
 import router, { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import Layout from "~/components/Layout/Layout";
+import Layout from "~/components/Layout";
 import { api } from "~/utils/api";
 
 type Inputs = {
@@ -145,7 +144,7 @@ export default function SignIn() {
         >
           {isSubmitting ? (
             <svg
-              aria-hidden="true"
+            aria-hidden="true"
               role="status"
               className="mr-3 inline h-4 w-4 animate-spin text-white"
               viewBox="0 0 100 101"

@@ -8,7 +8,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "~/server/db";
 import bcrypt from "bcrypt";
-import { env } from "~/env.mjs";
+import { env } from "~/env";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,13 +20,9 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      deposit: number;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 /**
@@ -45,9 +41,11 @@ export const authOptions: NextAuthOptions = {
     newUser: "/auth/signup",
   },
   callbacks: {
-    jwt(p) {
-      p.token.userData = p.user || p.token.userData;
-      return p.token;
+    session: ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.sub || '';
+      }
+      return session;
     },
   },
   adapter: PrismaAdapter(prisma),
@@ -80,21 +78,10 @@ export const authOptions: NextAuthOptions = {
           if (!valid) {
             return null;
           }
+          console.log(user)
           return user;
         }
       },
     }),
   ],
-};
-
-/**
- * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
- *
- * @see https://next-auth.js.org/configuration/nextjs
- */
-export const getServerAuthSession = (ctx: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
-  return getServerSession(ctx.req, ctx.res, authOptions);
 };

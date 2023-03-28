@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
-import Layout from "~/components/Layout/Layout";
+import Layout from "~/components/Layout";
 import router from "next/router";
 
 type Inputs = {
@@ -26,13 +26,16 @@ export default function SignIn() {
   }, [status]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const res = await signIn("credentials", { ...data, callbackUrl: "/", redirect: false });
+    const res = await signIn("credentials", { ...data, redirect: false });
     console.log(res)
     if (!res?.ok) {
       reset({
         password: ''
       })
       setError('email', {type: "validate", message: "Email or Password doesnt match"})
+    } else {
+      // need to hard reload for ws
+      location.href = "/"
     }
   };
 
@@ -78,7 +81,6 @@ export default function SignIn() {
         >
           {isSubmitting ? (
             <svg
-              aria-hidden="true"
               role="status"
               className="mr-3 inline h-4 w-4 animate-spin text-white"
               viewBox="0 0 100 101"

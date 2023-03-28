@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react';
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1).
@@ -17,7 +18,6 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
-import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { EventEmitter } from 'events';
 
@@ -51,11 +51,12 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
-
+export const createTRPCContext = async (opts: CreateNextContextOptions
+  | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>) => {
   // Get the session from the server using the getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+  const req = opts?.req;
+  const session =  await getSession({ req });
+  console.log(session)
 
   return createInnerTRPCContext({
     session,
@@ -72,6 +73,9 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
+import { type IncomingMessage } from "http";
+import type ws from "ws";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

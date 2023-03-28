@@ -1,9 +1,5 @@
 import { type NextPage } from "next";
-import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
-
-import { api } from "~/utils/api";
-import Layout from "~/components/Layout/Layout";
+import Layout from "~/components/Layout";
 
 const HOWS = [
   {

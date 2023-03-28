@@ -2,7 +2,7 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, {  } from "react";
 import {
   TbHammer,
   TbHandStop,
@@ -10,7 +10,7 @@ import {
   TbBookmarks,
   TbLogout,
 } from "react-icons/tb";
-import { api } from "~/utils/api";
+import DepositBallance from "../Deposit/DepositBallance";
 
 export default function Layout({
   children,
@@ -23,22 +23,9 @@ export default function Layout({
 }) {
   const { data: sessionData, status } = useSession();
 
-  const [ballance, setBallance] = useState<number>(0);
-
-  const depositBallance = api.user.getDepositBallance.useQuery();
-  api.user.onDepositChange.useSubscription(undefined, {
-    onData(data) {
-      setBallance(data.deposit);
-    },
-  });
-
-  useEffect(() => {
-    setBallance(depositBallance.data?.deposit || 0);
-  }, [depositBallance.data]);
-
   const onSignout = async () => {
-    await signOut()
-  }
+    await signOut();
+  };
   return (
     <>
       <Head>
@@ -64,8 +51,8 @@ export default function Layout({
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              clip-rule="evenodd"
-              fill-rule="evenodd"
+              clipRule="evenodd"
+              fillRule="evenodd"
               d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
             ></path>
           </svg>
@@ -150,6 +137,7 @@ export default function Layout({
                       <hr className="border-1 ml-4 w-full border-gray-400" />
                     </div>
                   </li>
+                  <DepositBallance />
                   <li>
                     <a
                       href="#"
@@ -165,10 +153,6 @@ export default function Layout({
                         alt={sessionData.user.email || "avatar"}
                       />
                       <span className="ml-3 flex-1">My Profile</span>
-                      <span>${ballance}</span>
-                      <button className="btn-primary ml-2 h-6 w-6 rounded-full p-0">
-                        +
-                      </button>
                     </a>
                   </li>
                   <li>
@@ -183,7 +167,7 @@ export default function Layout({
                   <li>
                     <button
                       onClick={onSignout}
-                      className="w-full flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                      className="flex w-full items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                     >
                       <TbLogout size={24} />
                       <span className="ml-3">Signout</span>

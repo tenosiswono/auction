@@ -4,9 +4,10 @@
  *
  * We also create a few inference helpers for input and output types.
  */
-import { httpBatchLink, loggerLink } from "@trpc/client";
+import { createWSClient, httpBatchLink, loggerLink, wsLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
+import { type NextPageContext } from "next/types";
 import superjson from "superjson";
 
 import { type AppRouter } from "~/server/api/root";
@@ -17,9 +18,34 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
+function getEndingLink(ctx: NextPageContext | undefined) {
+  if (typeof window === "undefined") {
+    return httpBatchLink({
+      url: `${getBaseUrl()}/api/trpc`,
+      headers() {
+        if (!ctx?.req?.headers) {
+          return {};
+        }
+        // on ssr, forward client's headers to the server
+        return {
+          ...ctx.req.headers,
+          'x-ssr': '1',
+        };
+      },
+    })
+  }
+
+  const client = createWSClient({
+    url: process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001",
+  });
+
+  return wsLink<AppRouter>({
+    client,
+  });
+}
 /** A set of type-safe react-query hooks for your tRPC API. */
 export const api = createTRPCNext<AppRouter>({
-  config() {
+  config({ ctx }) {
     return {
       /**
        * Transformer used for data de-serialization from the server.
@@ -39,9 +65,10 @@ export const api = createTRPCNext<AppRouter>({
             process.env.NODE_ENV === "development" ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
-        httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
+        getEndingLink(ctx),
+        // httpBatchLink({
+        //   url: `${getBaseUrl()}/api/trpc`,
+        // })
       ],
     };
   },
@@ -75,6 +102,7 @@ export function removeProperties<T>(obj: T, toRemove?: string[]): T {
     return obj ;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const newObj: any = Array.isArray(obj) ? [] : {};
 
   for (const [key, value] of Object.entries(obj)) {

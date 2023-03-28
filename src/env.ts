@@ -16,7 +16,7 @@ const server = z.object({
     // Since NextAuth.js automatically uses the VERCEL_URL if present.
     (str) => process.env.VERCEL_URL ?? str,
     // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-    process.env.VERCEL ? z.string().min(1) : z.string().url(),
+    process.env.VERCEL ? z.string().min(1) : z.string().url()
   ),
 });
 
@@ -51,25 +51,25 @@ const merged = server.merge(client);
 /** @typedef {z.infer<typeof merged>} MergedOutput */
 /** @typedef {z.SafeParseReturnType<MergedInput, MergedOutput>} MergedSafeParseReturn */
 
-let env = /** @type {MergedOutput} */ (process.env);
+let env = /** @type {MergedOutput} */ process.env;
 
 if (!!process.env.SKIP_ENV_VALIDATION == false) {
   const isServer = typeof window === "undefined";
 
-  const parsed = /** @type {MergedSafeParseReturn} */ (
-    isServer
-      ? merged.safeParse(processEnv) // on server we can validate all env vars
-      : client.safeParse(processEnv) // on client we can only validate the ones that are exposed
-  );
+  const parsed = /** @type {MergedSafeParseReturn} */ isServer
+    ? merged.safeParse(processEnv) // on server we can validate all env vars
+    : client.safeParse(processEnv); // on client we can only validate the ones that are exposed
 
   if (parsed.success === false) {
     console.error(
       "❌ Invalid environment variables:",
-      parsed.error.flatten().fieldErrors,
+      parsed.error.flatten().fieldErrors
     );
     throw new Error("Invalid environment variables");
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   env = new Proxy(parsed.data, {
     get(target, prop) {
       if (typeof prop !== "string") return undefined;
@@ -79,9 +79,12 @@ if (!!process.env.SKIP_ENV_VALIDATION == false) {
         throw new Error(
           process.env.NODE_ENV === "production"
             ? "❌ Attempted to access a server-side environment variable on the client"
-            : `❌ Attempted to access server-side environment variable '${prop}' on the client`,
+            : `❌ Attempted to access server-side environment variable '${prop}' on the client`
         );
-      return target[/** @type {keyof typeof target} */ (prop)];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return target[/** @type {keyof typeof target} */ prop];
     },
   });
 }

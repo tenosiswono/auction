@@ -39,7 +39,7 @@ export const userRouter = createTRPCRouter({
     const user = await ctx.prisma.user.findFirst({
       where: { id: ctx.session.user.id },
     });
-    return { success: true, deposit: user?.deposit };
+    return { success: true, deposit: user?.deposit, id: ctx.session.user.id };
   }),
   onDepositChange: protectedProcedure.subscription(({ctx}) => {
     return observable<User>((emit) => {
