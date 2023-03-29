@@ -10,10 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+generator erd {
+  provider = "prisma-erd-generator-markdown"
+  output   = "./ERD.md"
 }
 
 model Auction {
