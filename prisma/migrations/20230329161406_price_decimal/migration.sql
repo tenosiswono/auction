@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "Auction" ALTER COLUMN "currentPrice" SET DEFAULT 0,
+ALTER COLUMN "currentPrice" SET DATA TYPE DECIMAL(65,30);
+
+-- AlterTable
+ALTER TABLE "DepositHistory" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(65,30);
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "deposit" SET DEFAULT 0,
+ALTER COLUMN "deposit" SET DATA TYPE DECIMAL(65,30);

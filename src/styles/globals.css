@@ -4,7 +4,7 @@
 
 @layer components {
   .btn {
-    @apply rounded-lg px-5 py-2.5 text-center text-sm font-medium  focus:outline-none focus:ring-4 focus:ring-orange-300
+    @apply rounded-lg px-5 py-2.5 text-center text-sm font-medium  focus:outline-none focus:ring-4 focus:ring-orange-300 disabled:cursor-wait
   }
   .btn-primary {
     @apply btn bg-orange-700 hover:bg-orange-800 text-white
@@ -20,6 +20,9 @@
   }
   .form-label {
     @apply text-sm font-medium text-gray-800 data-[invalid]:text-red-700
+  }
+  .tab-nav {
+    @apply inline-block rounded-t-lg border-b-2 hover:border-gray-300 hover:text-gray-600 data-[active=true]:border-orange-600 p-4 data-[active=true]:text-orange-600
   }
 }
 

@@ -9,8 +9,7 @@ export const depositRouter = createTRPCRouter({
     .input(
       z
         .object({
-          amount: z.number(),
-          status: z.string(),
+          amount: z.number().gt(0),
         })
     ).mutation(async ({ ctx, input }) => {
       let user = await ctx.prisma.user.findFirst({
@@ -27,6 +26,7 @@ export const depositRouter = createTRPCRouter({
       const deposit = await ctx.prisma.depositHistory.create({
         data: {
           ...input,
+          status: 'credit',
           userId: ctx.session.user.id,
         },
       });

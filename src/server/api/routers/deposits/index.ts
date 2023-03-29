@@ -1,3 +1,2 @@
-import {depositRouter} from "./depositRouter"
-export {depositRouter}
-
+import { depositRouter } from "./depositRouter";
+export { depositRouter };

@@ -19,17 +19,17 @@ model Example {
 model Auction {
   id            String   @id @default(cuid())
   title         String
-  description   String   @db.Text
-  startingPrice Int      @default(0)
-  currentPrice  Int      @default(0)
+  image         String   @db.Text
+  startingPrice Float      @default(0)
+  currentPrice  Float      @default(0)
   duration      Int      @default(0)
-  startDate     DateTime
-  endDate       DateTime
+  startDate     DateTime?
+  endDate       DateTime?
   createdAt     DateTime @default(now())
   creatorId     String // user ID of the creator
   creator       User     @relation("AuctionCreator", fields: [creatorId], references: [id])
   bids          Bid[]
-  status        String   @default("active") // status of the auction: draft, active, completed, cancelled
+  status        String   @default("draft") // status of the auction: draft, active, completed, cancelled
   winnerId      String? // user ID of the winner
   winner        User?    @relation("AuctionWinner", fields: [winnerId], references: [id])
 }
@@ -48,7 +48,7 @@ model DepositHistory {
   id        String   @id @default(cuid())
   userId    String // user ID of the depositor
   user      User     @relation(fields: [userId], references: [id])
-  amount    Int
+  amount    Float
   status    String   @default("debit") // status of the auction: debit, credit, debit-pending
   createdAt DateTime @default(now())
 }
@@ -89,7 +89,7 @@ model User {
   password         String
   accounts         Account[]
   sessions         Session[]
-  deposit          Int              @default(0) // deposit balance of user
+  deposit          Float              @default(0) // deposit balance of user
   bids             Bid[] // bids made by the user
   depositHistories DepositHistory[] // reverse relation to Deposit.user
   wonAuctions      Auction[]        @relation("AuctionWinner") // reverse relation to Auction.winner

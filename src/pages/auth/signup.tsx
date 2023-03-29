@@ -1,16 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
 import Layout from "~/components/Layout";
 import { api } from "~/utils/api";
+import { processZodErrors } from "~/utils/transform";
 
-type Inputs = {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+const validationSchema = z.object({
+  name: z.string().min(1, { message: "name is required"}).min(3),
+  email: z.string().min(1, { message: "email is required"}).email(),
+  password: z.string().min(1, { message: "password is required"}).min(8),
+});
+
+type ValidationSchema = z.infer<typeof validationSchema>;
 
 export default function SignIn() {
   const {
@@ -19,7 +23,9 @@ export default function SignIn() {
     reset,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<Inputs>();
+  } = useForm<ValidationSchema>({
+    resolver: zodResolver(validationSchema),
+  });
   const { status } = useSession();
   const { push } = useRouter();
 
@@ -31,7 +37,7 @@ export default function SignIn() {
 
   const createUser = api.user.createUser.useMutation();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
     try {
       const res = await createUser.mutateAsync({
         name: data.name,
@@ -44,28 +50,14 @@ export default function SignIn() {
       }
     } catch (e) {
       if (createUser.error?.data?.zodError) {
-        if (createUser.error.data.zodError.fieldErrors.name) {
-          createUser.error.data.zodError.fieldErrors.name.forEach((err) => {
-            setError("name", { type: "validate", message: err });
-          });
-        }
-        if (createUser.error.data.zodError.fieldErrors.email) {
-          createUser.error.data.zodError.fieldErrors.email.forEach((err) => {
-            setError("email", { type: "validate", message: err });
-          });
-        }
-        if (createUser.error.data.zodError.fieldErrors.password) {
-          createUser.error.data.zodError.fieldErrors.password.forEach((err) => {
-            setError("password", { type: "validate", message: err });
-          });
-        }
+        processZodErrors(createUser.error?.data?.zodError, setError)
       }
       console.error(e);
     }
   };
 
   return (
-    <Layout title={"Auction"} description={"Auction"}>
+    <Layout title={"AuctionHive - Signout"}>
       <h1 className="mb-8 text-3xl font-bold">Register your Account</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-6">
@@ -73,10 +65,7 @@ export default function SignIn() {
             Your Name
           </label>
           <input
-            {...register("name", { required: "You must specify a name", minLength: {
-              value: 3,
-              message: "Name minimal has 3 length"
-            } })}
+            {...register("name")}
             data-invalid={errors.name}
             type="text"
             id="name"
@@ -97,7 +86,7 @@ export default function SignIn() {
             Your email
           </label>
           <input
-            {...register("email", { required: "You must specify a email" })}
+            {...register("email")}
             data-invalid={errors.email}
             type="email"
             id="email"
@@ -120,13 +109,7 @@ export default function SignIn() {
             Your password
           </label>
           <input
-            {...register("password", {
-              required: "You must specify a password",
-              minLength: {
-                value: 8,
-                message: "Password minimal has 8 length",
-              },
-            })}
+            {...register("password")}
             data-invalid={errors.password}
             type="password"
             id="password"

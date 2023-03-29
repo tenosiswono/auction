@@ -52,8 +52,7 @@ describe("DepositBalance component", () => {
     })
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledWith({
-        amount: 100,
-        status: 'credit'
+        amount: 100
       })
     })
     await waitFor(() => {

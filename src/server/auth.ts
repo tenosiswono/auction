@@ -78,7 +78,6 @@ export const authOptions: NextAuthOptions = {
           if (!valid) {
             return null;
           }
-          console.log(user)
           return user;
         }
       },

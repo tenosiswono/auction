@@ -3,11 +3,16 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
 import Layout from "~/components/Layout";
 import { useRouter } from "next/router";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type Inputs = {
-  email: string;
-  password: string;
-};
+
+const validationSchema = z.object({
+  email: z.string().min(1, { message: "email is required"}).email(),
+  password: z.string().min(1, { message: "password is required"}),
+});
+
+type ValidationSchema = z.infer<typeof validationSchema>;
 
 export default function SignIn() {
   const {
@@ -16,7 +21,9 @@ export default function SignIn() {
     reset,
     formState: { errors, isSubmitting },
     setError
-  } = useForm<Inputs>();
+  } = useForm<ValidationSchema>({
+    resolver: zodResolver(validationSchema),
+  });
   const { status } = useSession();
   const { push } = useRouter()
 
@@ -26,7 +33,7 @@ export default function SignIn() {
     }
   }, [push, status]);
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
     const res = await signIn("credentials", { ...data, redirect: false });
     if (!res?.ok) {
       reset({
@@ -40,7 +47,7 @@ export default function SignIn() {
   };
 
   return (
-    <Layout title={"Auction"} description={"Auction"}>
+    <Layout title={"AuctionHive - Signin"}>
       <h1 className="mb-8 text-3xl font-bold">Login to your Account</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-6">
@@ -48,7 +55,7 @@ export default function SignIn() {
             Your email
           </label>
           <input
-            {...register("email", { required: true })}
+            {...register("email")}
             data-invalid={errors.email} 
             type="email"
             id="email"
@@ -68,7 +75,7 @@ export default function SignIn() {
             Your password
           </label>
           <input
-            {...register("password", { required: true })}
+            {...register("password")}
             type="password"
             id="password"
             className="block w-full form-input"

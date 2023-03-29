@@ -2,6 +2,13 @@ import { render, screen } from '@testing-library/react';
 import Home from '~/pages/index';
 import { describe, expect, vi } from "vitest";
 
+vi.mock("next/router", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    query: {},
+    pathname: '/'
+  }),
+}));
 vi.mock("next-auth/react", () => ({
   signOut: vi.fn(),
   useSession: () => ({
@@ -28,6 +35,11 @@ vi.mock("~/utils/api", () => ({
         })),
       },
     },
+    auction: {
+      getAuctions: {
+        useQuery: vi.fn(() => ({ data: [] })),
+      }
+    }
   },
 }));
 describe('Home', () => {

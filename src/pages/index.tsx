@@ -1,5 +1,7 @@
 import { type NextPage } from "next";
+import AuctionList from "~/components/AuctionList";
 import Layout from "~/components/Layout";
+import useAuctions from "~/hooks/useAuctions";
 
 const HOWS = [
   {
@@ -25,14 +27,17 @@ const HOWS = [
 ];
 
 const Home: NextPage = () => {
+  const { auctions, isLoading } = useAuctions({
+    isPrivate: false,
+  });
   return (
-    <Layout title={"Auction"} description={"Auction"}>
+    <Layout>
       <div className="mb-12">
         <h3 className="text-md mb-4 font-medium text-gray-600">
           Join the hive and become a top bidder. Discover a new world of
           exciting auctions
         </h3>
-        <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-800 md:text-5xl lg:text-6xl mb-4">
+        <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-800 md:text-5xl lg:text-6xl">
           Bee the highest bidder with
         </h1>
         <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-800 md:text-5xl lg:text-6xl">
@@ -44,7 +49,7 @@ const Home: NextPage = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           {HOWS.map((how, index) => (
             <div
-              className="rounded-lg bg-white p-4 shadow-md"
+              className="rounded-lg border border-gray-200 bg-white p-4"
               key={`how-${index}`}
             >
               <h2 className="text-md mb-2 font-semibold">{how.title}</h2>
@@ -54,7 +59,10 @@ const Home: NextPage = () => {
         </div>
       </div>
       <div className="mb-12">
-        <h4 className="text-md mb-4 font-bold text-gray-800">Featured Auctions</h4>
+        <h4 className="text-md mb-4 font-bold text-gray-800">
+          Featured Auctions
+        </h4>
+        <AuctionList isLoading={isLoading} auctions={auctions} />
       </div>
     </Layout>
   );

@@ -65,26 +65,31 @@ export default function Layout({
         >
           <div className="flex h-full flex-col overflow-y-auto bg-orange-50 p-4">
             <ul className="space-y-2 font-medium">
-              <li className="mb-8 flex flex-col items-center justify-center">
-                <Image
-                  src="/logo.png"
-                  width={72}
-                  height={72}
-                  alt="AuctionHive"
-                />
+              <li className="mb-8 ">
+                <Link
+                  href="/"
+                  className="flex flex-col items-center justify-center"
+                >
+                  <Image
+                    src="/logo.png"
+                    width={72}
+                    height={72}
+                    alt="AuctionHive"
+                  />
 
-                <h1 className="mt-4 text-3xl font-extrabold leading-none tracking-tight text-gray-800">
-                  Auction<span className="text-orange-400">Hive</span>
-                </h1>
+                  <h1 className="mt-4 text-3xl font-extrabold leading-none tracking-tight text-gray-800">
+                    Auction<span className="text-orange-400">Hive</span>
+                  </h1>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/auctions"
                   className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                 >
                   <TbHammer size={24} />
                   <span className="ml-3">Auctions</span>
-                </a>
+                </Link>
               </li>
               {status !== "authenticated" ? (
                 <li>
@@ -106,25 +111,28 @@ export default function Layout({
               ) : (
                 <>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      href="/auctions/bid"
                       className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                     >
                       <TbBookmarks size={24} />
                       <span className="ml-3">Bidded Auctions</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      href="/auctions/me"
                       className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                     >
                       <TbHandStop size={24} />
                       <span className="ml-3">My Auctions</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/auth/signup" className="btn btn-primary block">
+                    <Link
+                      href="/auctions/new"
+                      className="btn btn-primary block"
+                    >
                       Start a new auction
                     </Link>
                   </li>
@@ -192,7 +200,7 @@ export default function Layout({
             </div>
           </div>
         </aside>
-        <div className="main-container h-screen bg-slate-50 p-12 sm:ml-64 md:p-24">
+        <div className="main-container min-h-screen bg-slate-50 p-12 sm:ml-64 md:p-20">
           {children}
         </div>
       </main>

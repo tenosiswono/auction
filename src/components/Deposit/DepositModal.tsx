@@ -3,10 +3,16 @@ import ReactDOM from "react-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { api } from "~/utils/api";
 import { TbX } from "react-icons/tb";
+import { z } from "zod";
+import { processZodErrors } from "~/utils/transform";
 
-type Inputs = {
-  amount: string;
-};
+const validationSchema = z.object({
+  amount: z
+    .number()
+    .gt(0, { message: "Starting Price must be larger than 0" }),
+});
+
+type ValidationSchema = z.infer<typeof validationSchema>;
 
 function DepositModal() {
   const {
@@ -15,7 +21,7 @@ function DepositModal() {
     reset,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<Inputs>();
+  } = useForm<ValidationSchema>();
 
   const closeModal = async () => {
     await import('./modal').then(m => m.modal.hide())
@@ -23,23 +29,16 @@ function DepositModal() {
 
   const createDeposit = api.deposit.createDeposit.useMutation();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
     try {
       await createDeposit.mutateAsync({
-        amount: parseInt(data.amount, 10),
-        status: "credit",
+        ...data
       });
       reset();
       await closeModal();
     } catch (e) {
       if (createDeposit.error?.data?.zodError) {
-        if (createDeposit.error.data.zodError.fieldErrors.amount) {
-          createDeposit.error.data.zodError.fieldErrors.amount.forEach(
-            (err) => {
-              setError("amount", { type: "validate", message: err });
-            }
-          );
-        }
+        processZodErrors(createDeposit.error?.data?.zodError, setError)
       }
       console.error(e);
     }
@@ -76,11 +75,12 @@ function DepositModal() {
                 </label>
                 <input
                   {...register("amount", {
-                    required: "You must specify an amount",
+                    setValueAs: (val: string) => parseFloat(val),
                   })}
                   data-invalid={errors.amount}
                   type="number"
                   id="amount"
+                  step="any"
                   className="form-input block w-full"
                   required
                   data-testid="deposit-input"

@@ -18,6 +18,11 @@ const server = z.object({
     // VERCEL_URL doesn't include `https` so it cant be validated as a URL
     process.env.VERCEL ? z.string().min(1) : z.string().url()
   ),
+  SUPABASE_URL: z.string().url(),
+  SUPABASE_KEY: z.string(),
+  SUPABASE_BUCKET: z.string(),
+  IMAGE_SERVER: z.string().url(),
+  INNGEST_EVENT_KEY: z.string(),
 });
 
 /**
@@ -39,7 +44,11 @@ const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
+  SUPABASE_BUCKET: process.env.SUPABASE_BUCKET,
+  IMAGE_SERVER: process.env.IMAGE_SERVER,
+  INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
 };
 
 // Don't touch the part below
@@ -47,18 +56,18 @@ const processEnv = {
 
 const merged = server.merge(client);
 
-/** @typedef {z.input<typeof merged>} MergedInput */
-/** @typedef {z.infer<typeof merged>} MergedOutput */
-/** @typedef {z.SafeParseReturnType<MergedInput, MergedOutput>} MergedSafeParseReturn */
+type MergedInput = z.input<typeof merged>;
+type MergedOutput = z.infer<typeof merged>;
+type MergedSafeParseReturn = z.SafeParseReturnType<MergedInput, MergedOutput>;
 
-let env = /** @type {MergedOutput} */ process.env;
+let env =  process.env as MergedOutput;
 
 if (!!process.env.SKIP_ENV_VALIDATION == false) {
   const isServer = typeof window === "undefined";
 
-  const parsed = /** @type {MergedSafeParseReturn} */ isServer
+  const parsed = (isServer
     ? merged.safeParse(processEnv) // on server we can validate all env vars
-    : client.safeParse(processEnv); // on client we can only validate the ones that are exposed
+    : client.safeParse(processEnv)) as MergedSafeParseReturn; // on client we can only validate the ones that are exposed
 
   if (parsed.success === false) {
     console.error(
