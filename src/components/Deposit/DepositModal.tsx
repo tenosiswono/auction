@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { api } from "~/utils/api";
-import { modal } from "./modal";
 import { TbX } from "react-icons/tb";
 
 type Inputs = {
@@ -47,6 +46,7 @@ function DepositModal() {
   };
   return (
     <div
+      data-testid="deposit-modal"
       id="depositModal"
       tabIndex={-1}
       className="fixed top-0 left-0 right-0 z-50 hidden h-[calc(100%-1rem)] w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0 md:h-full"
@@ -83,6 +83,7 @@ function DepositModal() {
                   id="amount"
                   className="form-input block w-full"
                   required
+                  data-testid="deposit-input"
                 />
                 {errors.amount ? (
                   <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -96,6 +97,7 @@ function DepositModal() {
                 type="submit"
                 disabled={isSubmitting}
                 className="btn btn-primary"
+                data-testid="deposit-submit"
               >
                 {isSubmitting ? (
                   <svg

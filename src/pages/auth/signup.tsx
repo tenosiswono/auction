@@ -1,5 +1,5 @@
 import { useSession } from "next-auth/react";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import Layout from "~/components/Layout";
@@ -25,9 +25,9 @@ export default function SignIn() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      void router.push("/");
+      void push("/");
     }
-  }, [status]);
+  }, [push, status]);
 
   const createUser = api.user.createUser.useMutation();
 
@@ -84,6 +84,7 @@ export default function SignIn() {
             className="form-input block w-full"
             placeholder="Jhon"
             required
+            data-testid="input-name"
           />
           {errors.name ? (
             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -103,6 +104,7 @@ export default function SignIn() {
             className="form-input block w-full"
             placeholder="name@flowbite.com"
             required
+            data-testid="input-email"
           />
           {errors.email ? (
             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -130,6 +132,7 @@ export default function SignIn() {
             id="password"
             className="form-input block w-full"
             required
+            data-testid="input-password"
           />
           {errors.password ? (
             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -141,6 +144,7 @@ export default function SignIn() {
           type="submit"
           disabled={isSubmitting}
           className="btn btn-primary mb-4 block w-full"
+          data-testid="btn-submit"
         >
           {isSubmitting ? (
             <svg

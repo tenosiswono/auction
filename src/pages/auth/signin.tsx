@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
 import Layout from "~/components/Layout";
-import router from "next/router";
+import { useRouter } from "next/router";
 
 type Inputs = {
   email: string;
@@ -18,16 +18,16 @@ export default function SignIn() {
     setError
   } = useForm<Inputs>();
   const { status } = useSession();
+  const { push } = useRouter()
 
   useEffect(() => {
     if (status === "authenticated") {
-      void router.push("/");
+      void push("/");
     }
-  }, [status]);
+  }, [push, status]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const res = await signIn("credentials", { ...data, redirect: false });
-    console.log(res)
     if (!res?.ok) {
       reset({
         password: ''
@@ -55,6 +55,7 @@ export default function SignIn() {
             className="block w-full form-input"
             placeholder="name@flowbite.com"
             required
+            data-testid="input-email"
           />
           {errors.email ? (
             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -72,12 +73,14 @@ export default function SignIn() {
             id="password"
             className="block w-full form-input"
             required
+            data-testid="input-password"
           />
         </div>
         <button
           type="submit"
           disabled={isSubmitting}
           className="mb-4 block w-full btn btn-primary"
+          data-testid="btn-submit"
         >
           {isSubmitting ? (
             <svg
