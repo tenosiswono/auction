@@ -6,17 +6,18 @@ import { TbMoodEmpty } from "react-icons/tb";
 type AuctionListProps = {
   isLoading: boolean;
   auctions: GetAuctionResponse[];
+  keyStatus: string | number;
 };
 
 export default function AuctionList(props: AuctionListProps) {
-  const { isLoading, auctions } = props;
+  const { isLoading, auctions, keyStatus } = props;
   return (
     <div className="flex flex-row flex-wrap gap-4">
       {isLoading ? (
         <div>loading</div>
       ) : auctions.length > 0 ? (
         auctions.map((auction) => (
-          <AuctionItem key={auction.id} data={auction} />
+          <AuctionItem key={`${keyStatus}-${auction.id}`} data={auction} />
         ))
       ) : (
         <div className="flex h-64 flex-1 flex-col items-center justify-center">

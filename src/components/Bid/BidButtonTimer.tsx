@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TbLoader2 } from "react-icons/tb";
 
-const TIME_DELAY = 10 * 1000;
+const TIME_DELAY = 5 * 1000;
 
 type BidTimerProps = {
   updatedAt?: Date;

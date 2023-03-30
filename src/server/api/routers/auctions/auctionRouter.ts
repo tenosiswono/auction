@@ -10,7 +10,6 @@ import { type Auction } from "@prisma/client";
 import { inngest } from "~/pages/api/inngest";
 import { AUCTION_STATUS, PUBLIC_STATUS } from "~/constants/auction";
 import { observable } from "@trpc/server/observable";
-import { removeProperties } from "~/utils/api";
 
 export const auctionRouter = createTRPCRouter({
   createAuction: protectedProcedure
@@ -229,6 +228,96 @@ export const auctionRouter = createTRPCRouter({
         data: auctions,
       };
     }),
+  getBidAuctions: protectedProcedure
+    .input(
+      z.object({
+        status: z.string().nullish(),
+        offset: z.number().nullish(),
+        limit: z.number().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const bids = await ctx.prisma.bid.findMany({
+        where: {
+          bidderId: ctx.session.user.id,
+        },
+        select: {
+          auctionId: true,
+        },
+      });
+      console.log(bids)
+      const whereClause = [];
+      if (input.status && PUBLIC_STATUS.indexOf(input.status) > -1) {
+        whereClause.push({ status: input.status });
+      } else {
+        whereClause.push({
+          status: {
+            in: PUBLIC_STATUS,
+          },
+        });
+      }
+
+      const auctions = await ctx.prisma.auction.findMany({
+        orderBy: { createdAt: "desc" },
+        include: {
+          _count: {
+            select: {
+              bids: true,
+            },
+          },
+          ...(ctx.session?.user.id
+            ? {
+                bids: {
+                  where: {
+                    bidderId: ctx.session.user.id,
+                  },
+                  select: {
+                    bidderId: true,
+                    updatedAt: true,
+                    amount: true,
+                    id: true,
+                  },
+                },
+              }
+            : {}),
+          winner: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+          creator: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+        take: input.limit || 12, // default 12
+        skip: input.offset || 0,
+        where:
+          whereClause.length > 0
+            ? {
+                AND: [
+                  ...whereClause,
+                  {
+                    id: {
+                      in: bids.map((bid) => bid.auctionId),
+                    },
+                  },
+                ],
+              }
+            : {
+              id: {
+                in: bids.map((bid) => bid.auctionId),
+              },
+            },
+      });
+      return {
+        success: true,
+        data: auctions,
+      };
+    }),
   onAuctionChange: publicProcedure
     .input(
       z.object({
@@ -238,9 +327,7 @@ export const auctionRouter = createTRPCRouter({
     .subscription(({ ctx, input }) => {
       return observable<GetAuctionResponse>((emit) => {
         const onAuctionChange = (data: GetAuctionResponse) => {
-          if (
-            data.id === input.auctionId
-          ) {
+          if (data.id === input.auctionId) {
             if (data.bids?.[0]?.bidderId === ctx.session?.user.id) {
               emit.next(data);
             } else {

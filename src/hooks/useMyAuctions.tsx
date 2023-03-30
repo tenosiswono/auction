@@ -19,9 +19,12 @@ export default function useMyAuctions() {
 
   const [status, setStatus] = useState(initStatus);
   const [auctions, setAuctions] = useState<GetAuctionResponse[]>([]);
-
-  const { data, isLoading } = api.auction.getMyAuctions.useQuery({
+  
+  const { data, isLoading, refetch } = api.auction.getMyAuctions.useQuery({
     status,
+  }, {
+    refetchOnWindowFocus: false,
+    cacheTime: 0
   });
   
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function useMyAuctions() {
     })
     setStatus(status)
     setAuctions([])
+    void refetch()
   }
   return {
     status,

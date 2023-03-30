@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TbLoader2, TbUsers } from "react-icons/tb";
 import AuctionStatus from "./AuctionStatus";
 import { AUCTION_STATUS } from "~/constants/auction";
@@ -9,6 +9,7 @@ import { api } from "~/utils/api";
 import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRouter";
 import { useRouter } from "next/router";
 import BidButton from "../Bid/BidButton";
+import moment from "moment";
 
 type AuctionItemProps = {
   data: GetAuctionResponse;
@@ -22,29 +23,32 @@ export default function AuctionItem(props: AuctionItemProps) {
   const auctionRef = useRef(data);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  if (auction.status === AUCTION_STATUS.active) {
-    api.auction.onAuctionChange.useSubscription(
-      { auctionId: auction.id },
-      {
-        onData: (data) => {
-          const newAuction: GetAuctionResponse = {
-            ...auctionRef.current,
-            currentPrice: data.currentPrice,
-            _count: {
-              bids: data._count.bids,
-            },
-            ...(data.bids
-              ? {
-                  bids: data.bids,
-                }
-              : {}),
-          }
-          auctionRef.current = newAuction
-          setAuction(newAuction);
-        },
-      }
-    );
-  }
+
+  api.auction.onAuctionChange.useSubscription(
+    { auctionId: auction.id },
+    {
+      onData: (data) => {
+        const newAuction: GetAuctionResponse = {
+          ...auctionRef.current,
+          currentPrice: data.currentPrice,
+          _count: {
+            bids: data._count.bids,
+          },
+          ...(data.bids
+            ? {
+                bids: data.bids,
+              }
+            : {}),
+        };
+        auctionRef.current = newAuction;
+        setAuction(newAuction);
+      },
+    }
+  );
+
+  useEffect(() => {
+    setAuction(data);
+  }, [data]);
   const ownAuction = auction.creatorId === sessioData?.user.id;
 
   const publishAuction = api.auction.publishAuction.useMutation();
@@ -65,13 +69,14 @@ export default function AuctionItem(props: AuctionItemProps) {
   };
   return (
     <div className="w-56 rounded-lg border border-gray-200 bg-white">
-      <Image
-        className="h-56 w-56 rounded-t-lg"
-        src={auction.image}
-        alt={auction.title}
-        height={224}
-        width={224}
-      />
+      <div className="h-56 w-56 rounded-t-lg flex items-center justify-center">
+        <Image
+          src={auction.image}
+          alt={auction.title}
+          height={224}
+          width={224}
+        />
+      </div>
       <div className="px-4 pb-4 pt-2">
         <div className="mb-1 flex flex-row items-center text-sm text-gray-600">
           <TbUsers className="mr-1" />
@@ -102,8 +107,10 @@ export default function AuctionItem(props: AuctionItemProps) {
               Winner: {auction.winner?.name || "-"}
             </div>
           )}
-          {sessioData?.user.id && auction.creatorId !== sessioData?.user.id &&
-          auction.status === AUCTION_STATUS.active ? (
+          {sessioData?.user.id &&
+          auction.creatorId !== sessioData?.user.id &&
+          auction.status === AUCTION_STATUS.active &&
+          moment(auction.endDate).isAfter(moment()) ? (
             <BidButton
               updatedAt={auction.bids?.[0]?.updatedAt}
               currentPrice={auction.currentPrice}
@@ -124,6 +131,13 @@ export default function AuctionItem(props: AuctionItemProps) {
             </button>
           ) : null}
         </div>
+        {auction.bids?.[0] ? (
+          <div className="text-sm text-gray-600">
+            {auction.bids?.[0].amount !== auction.currentPrice
+              ? "Outbidded!"
+              : "You are last bidder!"}
+          </div>
+        ) : null}
       </div>
     </div>
   );

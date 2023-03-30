@@ -42,9 +42,12 @@ export default function AuctionTimer(props: AuctionTimerProps) {
 
   return (
     <div>
-      {hours >= 0 ? padWithZeros(hours, 2) : "--"}:
-      {minutes >= 0 ? padWithZeros(minutes, 2) : "--"}:
-      {seconds >= 0 ? padWithZeros(seconds, 2) : "--"}
+      {hours <= 0 && minutes <= 0 && seconds <= 0
+        ? "Finished"
+        : `${padWithZeros(hours, 2)}:${padWithZeros(minutes, 2)}:${padWithZeros(
+            seconds,
+            2
+          )}`}
     </div>
   );
 }

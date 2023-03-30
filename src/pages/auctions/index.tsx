@@ -25,7 +25,7 @@ const AuctionIndex: NextPage = () => {
           ))}
         </ul>
       </div>
-      <AuctionList isLoading={isLoading} auctions={auctions} />
+      <AuctionList isLoading={isLoading} auctions={auctions} keyStatus={status} />
     </Layout>
   );
 };

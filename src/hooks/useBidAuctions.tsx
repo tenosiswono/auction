@@ -5,7 +5,7 @@ import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRo
 import { api } from "~/utils/api";
 
 
-export default function useAuctions() {
+export default function useBidAuctions() {
   const router = useRouter();
   const { status: qStatus } = router.query;
   let initStatus: string;
@@ -20,7 +20,7 @@ export default function useAuctions() {
   const [status, setStatus] = useState(initStatus);
   const [auctions, setAuctions] = useState<GetAuctionResponse[]>([]);
 
-  const { data, isLoading, refetch } = api.auction.getAuctions.useQuery({
+  const { data, isLoading, refetch } = api.auction.getBidAuctions.useQuery({
     status,
   }, {
     refetchOnWindowFocus: false,

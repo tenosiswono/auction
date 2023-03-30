@@ -38,4 +38,25 @@ export const depositRouter = createTRPCRouter({
         data: deposit,
       };
     }),
+  getMyDeposit: protectedProcedure
+    .input(
+      z.object({
+        offset: z.number().nullish(),
+        limit: z.number().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const deposits = await ctx.prisma.depositHistory.findMany({
+        orderBy: { createdAt: "desc" },
+        where: {
+          userId: ctx.session.user.id,
+        },
+        take: input.limit || 12, // default 12
+        skip: input.offset || 0,
+      });
+      return {
+        success: true,
+        data: deposits
+      }
+    }),
 });

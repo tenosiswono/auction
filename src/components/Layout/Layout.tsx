@@ -116,7 +116,7 @@ export default function Layout({
                       className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                     >
                       <TbBookmarks size={24} />
-                      <span className="ml-3">Bidded Auctions</span>
+                      <span className="ml-3">Bid Auctions</span>
                     </Link>
                   </li>
                   <li>
@@ -164,13 +164,13 @@ export default function Layout({
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      href="/deposits"
                       className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
                     >
                       <TbPigMoney size={24} />
                       <span className="ml-3">Deposit Histories</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <button
