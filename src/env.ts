@@ -23,6 +23,7 @@ const server = z.object({
   SUPABASE_BUCKET: z.string(),
   IMAGE_SERVER: z.string().url(),
   INNGEST_EVENT_KEY: z.string(),
+  INNGEST_SIGNING_KEY: z.string()
 });
 
 /**
@@ -49,6 +50,7 @@ const processEnv = {
   SUPABASE_BUCKET: process.env.SUPABASE_BUCKET,
   IMAGE_SERVER: process.env.IMAGE_SERVER,
   INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+  INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
 };
 
 // Don't touch the part below

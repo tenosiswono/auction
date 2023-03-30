@@ -1,14 +1,13 @@
 import { type NextPage } from "next";
 import Layout from "~/components/Layout";
 import Auth from "~/components/Auth";
-import useAuctions, { PRIVATE_STATUS } from "~/hooks/useAuctions";
 import AuctionList from "~/components/AuctionList";
 import { capitalizeWord } from "~/utils/transform";
+import { PRIVATE_STATUS } from "~/constants/auction";
+import useMyAuctions from "~/hooks/useMyAuctions";
 
 const AuctionIndex: NextPage = () => {
-  const { status, setStatus, auctions, isLoading } = useAuctions({
-    isPrivate: true,
-  });
+  const { status, setStatus, auctions, isLoading } = useMyAuctions();
 
   return (
     <Auth>

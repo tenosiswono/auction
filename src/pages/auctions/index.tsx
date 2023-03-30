@@ -1,13 +1,12 @@
 import { type NextPage } from "next";
 import Layout from "~/components/Layout";
-import useAuctions, { PUBLIC_STATUS } from "~/hooks/useAuctions";
+import useAuctions from "~/hooks/useAuctions";
 import AuctionList from "~/components/AuctionList";
 import { capitalizeWord } from "~/utils/transform";
+import { PUBLIC_STATUS } from "~/constants/auction";
 
 const AuctionIndex: NextPage = () => {
-  const { status, setStatus, auctions, isLoading } = useAuctions({
-    isPrivate: false,
-  });
+  const { status, setStatus, auctions, isLoading } = useAuctions();
   return (
     <Layout title={"AuctionHive - List Auctions"}>
       <h1 className="mb-4 text-3xl font-bold">List Auctions</h1>

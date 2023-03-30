@@ -1,17 +1,17 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { AUCTION_STATUS, PUBLIC_STATUS } from "~/constants/auction";
+import { AUCTION_STATUS, PRIVATE_STATUS } from "~/constants/auction";
 import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRouter";
 import { api } from "~/utils/api";
 
 
-export default function useAuctions() {
+export default function useMyAuctions() {
   const router = useRouter();
   const { status: qStatus } = router.query;
   let initStatus: string;
   const qStatusString = (qStatus || "").toString();
 
-  if (PUBLIC_STATUS.indexOf(qStatusString) < 0) {
+  if (PRIVATE_STATUS.indexOf(qStatusString) < 0) {
     initStatus = AUCTION_STATUS.active;
   } else {
     initStatus = qStatusString;
@@ -20,10 +20,8 @@ export default function useAuctions() {
   const [status, setStatus] = useState(initStatus);
   const [auctions, setAuctions] = useState<GetAuctionResponse[]>([]);
 
-  const { data, isLoading } = api.auction.getAuctions.useQuery({
+  const { data, isLoading } = api.auction.getMyAuctions.useQuery({
     status,
-  }, {
-    refetchOnWindowFocus: false
   });
   
   useEffect(() => {

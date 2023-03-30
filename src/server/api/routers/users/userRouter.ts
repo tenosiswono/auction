@@ -50,7 +50,7 @@ export const userRouter = createTRPCRouter({
       };
       ctx.ee.on('onDepositChange', onDepositChange);
       return () => {
-        ctx.ee.off('add', onDepositChange);
+        ctx.ee.off('onDepositChange', onDepositChange);
       };
     })
   }),

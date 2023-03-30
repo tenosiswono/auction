@@ -1,11 +1,16 @@
-import { publicProcedure } from "./../../trpc";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import moment from "moment";
 import { uploadImg } from "~/utils/uploadImg";
 import { type Auction } from "@prisma/client";
 import { inngest } from "~/pages/api/inngest";
-import { AUCTION_STATUS } from "~/constants/auction";
+import { AUCTION_STATUS, PUBLIC_STATUS } from "~/constants/auction";
+import { observable } from "@trpc/server/observable";
+import { removeProperties } from "~/utils/api";
 
 export const auctionRouter = createTRPCRouter({
   createAuction: protectedProcedure
@@ -58,16 +63,19 @@ export const auctionRouter = createTRPCRouter({
       });
       if (auction) {
         const startDate = moment();
-        const endDate = startDate.add(auction.duration, "minutes");
+        const endDate = startDate.add(auction.duration, "hours");
         const auctionRes = await ctx.prisma.auction.update({
           where: { id: input.id },
           data: {
             startDate: startDate.toISOString(),
             endDate: endDate.toISOString(),
+            updatedAt: moment().toISOString(),
             status: AUCTION_STATUS.active,
           },
         });
-        await inngest.send("app/auction.publish", { data: { id: auctionRes.id, endDate: auctionRes.endDate } })
+        await inngest.send("app/auction.publish", {
+          data: { id: auctionRes.id, endDate: auctionRes.endDate },
+        });
         return {
           success: true,
         };
@@ -84,28 +92,45 @@ export const auctionRouter = createTRPCRouter({
     .input(
       z.object({
         status: z.string().nullish(),
-        creatorId: z.string().nullish(),
         offset: z.number().nullish(),
         limit: z.number().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
       const whereClause = [];
-      if (input.status) {
+      if (input.status && PUBLIC_STATUS.indexOf(input.status) > -1) {
         whereClause.push({ status: input.status });
+      } else {
+        whereClause.push({
+          status: {
+            in: PUBLIC_STATUS,
+          },
+        });
       }
-      if (input.creatorId) {
-        whereClause.push({ creatorId: input.creatorId });
-      }
+
       const auctions = await ctx.prisma.auction.findMany({
         orderBy: { createdAt: "desc" },
         include: {
-          bids: {
+          _count: {
             select: {
-              bidderId: true,
-              amount: true,
+              bids: true,
             },
           },
+          ...(ctx.session?.user.id
+            ? {
+                bids: {
+                  where: {
+                    bidderId: ctx.session.user.id,
+                  },
+                  select: {
+                    bidderId: true,
+                    updatedAt: true,
+                    amount: true,
+                    id: true,
+                  },
+                },
+              }
+            : {}),
           winner: {
             select: {
               name: true,
@@ -133,13 +158,119 @@ export const auctionRouter = createTRPCRouter({
         data: auctions,
       };
     }),
+  getMyAuctions: protectedProcedure
+    .input(
+      z.object({
+        status: z.string().nullish(),
+        offset: z.number().nullish(),
+        limit: z.number().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const whereClause = [];
+      if (input.status) {
+        whereClause.push({ status: input.status });
+      } else {
+        whereClause.push({
+          status: {
+            in: PUBLIC_STATUS,
+          },
+        });
+      }
+      whereClause.push({ creatorId: ctx.session.user.id });
+
+      const auctions = await ctx.prisma.auction.findMany({
+        orderBy: { createdAt: "desc" },
+        include: {
+          _count: {
+            select: {
+              bids: true,
+            },
+          },
+          ...(ctx.session?.user.id
+            ? {
+                bids: {
+                  where: {
+                    bidderId: ctx.session.user.id,
+                  },
+                  select: {
+                    bidderId: true,
+                    updatedAt: true,
+                    amount: true,
+                    id: true,
+                  },
+                },
+              }
+            : {}),
+          winner: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+          creator: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+        take: input.limit || 12, // default 12
+        skip: input.offset || 0,
+        where:
+          whereClause.length > 0
+            ? {
+                AND: whereClause,
+              }
+            : undefined,
+      });
+      return {
+        success: true,
+        data: auctions,
+      };
+    }),
+  onAuctionChange: publicProcedure
+    .input(
+      z.object({
+        auctionId: z.string().nullish(),
+      })
+    )
+    .subscription(({ ctx, input }) => {
+      return observable<GetAuctionResponse>((emit) => {
+        const onAuctionChange = (data: GetAuctionResponse) => {
+          if (
+            data.id === input.auctionId
+          ) {
+            if (data.bids?.[0]?.bidderId === ctx.session?.user.id) {
+              emit.next(data);
+            } else {
+              emit.next({
+                ...data,
+                bids: undefined,
+              });
+            }
+          }
+        };
+        ctx.ee.on("onAuctionChange", onAuctionChange);
+        return () => {
+          ctx.ee.off("onAuctionChange", onAuctionChange);
+        };
+      });
+    }),
 });
 
 export type GetAuctionResponse = Auction & {
-  bids: {
-    amount: number;
-    bidderId: string;
-  }[];
+  bids?:
+    | {
+        updatedAt: Date;
+        amount: number;
+        bidderId: string;
+        id: string;
+      }[]
+    | undefined;
+  _count: {
+    bids: number;
+  };
   creator: {
     id: string;
     name: string | null;

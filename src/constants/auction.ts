@@ -4,3 +4,14 @@ export enum AUCTION_STATUS {
   cancelled = 'cancelled',
   completed = 'completed',
 }
+
+export const PUBLIC_STATUS: string[] = [
+  AUCTION_STATUS.active,
+  AUCTION_STATUS.completed,
+];
+
+export const PRIVATE_STATUS: string[] = [
+  ...PUBLIC_STATUS,
+  AUCTION_STATUS.draft,
+  AUCTION_STATUS.cancelled,
+];

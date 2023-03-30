@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import DepositModalPortal from "./DepositModal";
 
-
 export default function DepositButton() {
-  const openModal = async() => {
-    await import('./modal').then(m => m.modal.show())
-  }
+  const [modalOpen, setModalOpen] = useState(false);
+  const openModal = () => {
+    setModalOpen(true);
+  };
   return (
     <>
       <button
@@ -14,7 +14,7 @@ export default function DepositButton() {
       >
         +
       </button>
-      <DepositModalPortal />
+      {modalOpen ? <DepositModalPortal setModalOpen={setModalOpen} /> : null}
     </>
   );
 }
