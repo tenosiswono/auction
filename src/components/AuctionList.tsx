@@ -2,6 +2,7 @@ import React from "react";
 import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRouter";
 import AuctionItem from "./AuctionItem/AuctionItem";
 import { TbMoodEmpty } from "react-icons/tb";
+import { AuctionListSkeleton } from "./AuctionItem/AuctionSkeleton";
 
 type AuctionListProps = {
   isLoading: boolean;
@@ -14,7 +15,7 @@ export default function AuctionList(props: AuctionListProps) {
   return (
     <div className="flex flex-row flex-wrap gap-4">
       {isLoading ? (
-        <div>loading</div>
+        <AuctionListSkeleton />
       ) : auctions.length > 0 ? (
         auctions.map((auction) => (
           <AuctionItem key={`${keyStatus}-${auction.id}`} data={auction} />

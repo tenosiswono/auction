@@ -69,12 +69,22 @@ export default function AuctionItem(props: AuctionItemProps) {
   };
   return (
     <div className="w-56 rounded-lg border border-gray-200 bg-white">
-      <div className="h-56 w-56 rounded-t-lg flex items-center justify-center">
+      <div
+        className="flex items-center justify-center rounded-t-lg"
+        style={{
+          height: 222,
+          width: 222,
+        }}
+      >
         <Image
+          style={{
+            height: 222,
+          }}
+          className="w-auto rounded-t-lg"
           src={auction.image}
           alt={auction.title}
-          height={224}
-          width={224}
+          height={222}
+          width={222}
         />
       </div>
       <div className="px-4 pb-4 pt-2">
