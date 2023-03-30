@@ -10,11 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator erd {
-  provider = "prisma-erd-generator-markdown"
-  output   = "./ERD.md"
-}
-
 model Auction {
   id            String   @id @default(cuid())
   title         String
@@ -25,6 +20,7 @@ model Auction {
   startDate     DateTime?
   endDate       DateTime?
   createdAt     DateTime @default(now())
+  updatedAt DateTime @default(now())
   creatorId     String // user ID of the creator
   creator       User     @relation("AuctionCreator", fields: [creatorId], references: [id])
   bids          Bid[]
@@ -35,12 +31,15 @@ model Auction {
 
 model Bid {
   id        String   @id @default(cuid())
-  amount    Int
+  amount    Float
   bidderId  String // user ID of the bidder
   bidder    User     @relation(fields: [bidderId], references: [id])
   auctionId String // auction ID of the auction being bid on
   auction   Auction  @relation(fields: [auctionId], references: [id])
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([bidderId, auctionId])
 }
 
 model DepositHistory {
@@ -48,8 +47,9 @@ model DepositHistory {
   userId    String // user ID of the depositor
   user      User     @relation(fields: [userId], references: [id])
   amount    Float
-  status    String   @default("debit") // status of the auction: debit, credit, debit-pending
+  status    String   @default("debit") // status of the auction: debit, credit
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 // Necessary for Next auth

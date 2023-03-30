@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Auction" ALTER COLUMN "startingPrice" SET DEFAULT 0,
-ALTER COLUMN "startingPrice" SET DATA TYPE DOUBLE PRECISION;

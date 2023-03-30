@@ -1,23 +1,17 @@
 -- CreateTable
-CREATE TABLE "Example" (
-    "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Example_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Auction" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "startingPrice" INTEGER NOT NULL,
-    "currentPrice" INTEGER NOT NULL DEFAULT 0,
-    "startDate" TIMESTAMP(3) NOT NULL,
-    "endDate" TIMESTAMP(3) NOT NULL,
+    "image" TEXT NOT NULL,
+    "startingPrice" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "currentPrice" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "duration" INTEGER NOT NULL DEFAULT 0,
+    "startDate" TIMESTAMP(3),
+    "endDate" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "creatorId" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'active',
+    "status" TEXT NOT NULL DEFAULT 'draft',
     "winnerId" TEXT,
 
     CONSTRAINT "Auction_pkey" PRIMARY KEY ("id")
@@ -26,10 +20,11 @@ CREATE TABLE "Auction" (
 -- CreateTable
 CREATE TABLE "Bid" (
     "id" TEXT NOT NULL,
-    "amount" INTEGER NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
     "bidderId" TEXT NOT NULL,
     "auctionId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Bid_pkey" PRIMARY KEY ("id")
 );
@@ -38,9 +33,10 @@ CREATE TABLE "Bid" (
 CREATE TABLE "DepositHistory" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "amount" INTEGER NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'debit',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "DepositHistory_pkey" PRIMARY KEY ("id")
 );
@@ -80,7 +76,8 @@ CREATE TABLE "User" (
     "email" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
-    "deposit" INTEGER NOT NULL DEFAULT 0,
+    "password" TEXT NOT NULL,
+    "deposit" DOUBLE PRECISION NOT NULL DEFAULT 0,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -91,6 +88,9 @@ CREATE TABLE "VerificationToken" (
     "token" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Bid_bidderId_auctionId_key" ON "Bid"("bidderId", "auctionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
