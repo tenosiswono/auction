@@ -1,6 +1,8 @@
-# AuctionHive
+# [AuctionHive](auction.teno.dev)
 
 Realtime Auction System
+
+https://auction.teno.dev
 
 ## Setup
 To get started with the project, follow these steps:
