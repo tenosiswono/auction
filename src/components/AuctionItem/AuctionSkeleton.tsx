@@ -38,13 +38,15 @@ export default function AuctionSkeleton() {
     </div>
   );
 }
-
-export function AuctionListSkeleton() {
+type AuctionListSkeletonProps  = {
+  prefixKey: string
+}
+export function AuctionListSkeleton({prefixKey}: AuctionListSkeletonProps) {
   return (
     <>
-      <AuctionSkeleton />
-      <AuctionSkeleton />
-      <AuctionSkeleton />
+      <AuctionSkeleton key={`loader-1-${prefixKey}`} />
+      <AuctionSkeleton key={`loader-2-${prefixKey}`} />
+      <AuctionSkeleton key={`loader-3-${prefixKey}`} />
     </>
   );
 }

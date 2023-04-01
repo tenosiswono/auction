@@ -1,41 +1,54 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { AUCTION_STATUS, PUBLIC_STATUS } from "~/constants/auction";
-import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRouter";
+import { useInView } from "react-intersection-observer";
+import { AUCTION_STATUS, PRIVATE_STATUS, PUBLIC_STATUS } from "~/constants/auction";
 import { api } from "~/utils/api";
 
-
-export default function useAuctions() {
+const mapProcedure = {
+  index: api.auction.getAuctions,
+  me: api.auction.getMyAuctions,
+  bid: api.auction.getBidAuctions
+}
+type useAuctionsProps = {
+  page: 'index' | 'me' | 'bid'
+}
+export default function useAuctions({ page } :useAuctionsProps) {
   const router = useRouter();
+  const { ref: refInview, inView } = useInView();
+
   const { status: qStatus } = router.query;
   let initStatus: string;
   const qStatusString = (qStatus || "").toString();
+  const statusFilter = page === 'me' ? PRIVATE_STATUS : PUBLIC_STATUS
 
-  if (PUBLIC_STATUS.indexOf(qStatusString) < 0) {
+  if (statusFilter.indexOf(qStatusString) < 0) {
     initStatus = AUCTION_STATUS.active;
   } else {
     initStatus = qStatusString;
   }
 
   const [status, setStatus] = useState(initStatus);
-  const [auctions, setAuctions] = useState<GetAuctionResponse[]>([]);
 
-  const { data, isLoading, refetch } = api.auction.getAuctions.useQuery({
-    status,
-  }, {
-    refetchOnWindowFocus: false,
-    cacheTime: 0
-  });
-  
-  useEffect(() => {
-    setStatus(initStatus)
-  }, [initStatus])
-
-  useEffect(() => {
-    if (data?.data) {
-      setAuctions(data.data);
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = mapProcedure[page].useInfiniteQuery(
+    {
+      status,
+    },
+    {
+      refetchOnWindowFocus: false,
+      cacheTime: 0,
+      getNextPageParam: (lastPage): string | undefined => lastPage.nextCursor,
     }
-  }, [data]);
+  );
+
+  useEffect(() => {
+    setStatus(initStatus);
+  }, [initStatus]);
 
   const setStatusQuery = (status: string) => {
     void router.replace({
@@ -43,16 +56,25 @@ export default function useAuctions() {
       query: {
         ...router.query,
         status,
-      }
-    })
-    setStatus(status)
-    setAuctions([])
-    void refetch()
-  }
+      },
+    });
+    setStatus(status);
+  };
+
+  useEffect(() => {
+    if (inView) {
+      void fetchNextPage();
+    }
+  }, [inView, fetchNextPage]);
+
   return {
     status,
+    statusFilter,
     setStatus: setStatusQuery,
-    auctions,
+    auctions: data,
     isLoading,
+    refInview,
+    hasNextPage,
+    isFetchingNextPage,
   };
 }

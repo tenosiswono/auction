@@ -91,14 +91,15 @@ export const auctionRouter = createTRPCRouter({
     .input(
       z.object({
         status: z.string().nullish(),
-        offset: z.number().nullish(),
-        limit: z.number().nullish(),
+        limit: z.number().min(1).max(100).default(12),
+        cursor: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const { cursor, status, limit } = input;
       const whereClause = [];
-      if (input.status && PUBLIC_STATUS.indexOf(input.status) > -1) {
-        whereClause.push({ status: input.status });
+      if (status && PUBLIC_STATUS.indexOf(status) > -1) {
+        whereClause.push({ status });
       } else {
         whereClause.push({
           status: {
@@ -143,8 +144,8 @@ export const auctionRouter = createTRPCRouter({
             },
           },
         },
-        take: input.limit || 12, // default 12
-        skip: input.offset || 0,
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
         where:
           whereClause.length > 0
             ? {
@@ -152,23 +153,31 @@ export const auctionRouter = createTRPCRouter({
               }
             : undefined,
       });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (auctions.length > limit) {
+        const nextItem = auctions.pop(); // return the last item from the array
+        nextCursor = nextItem?.id;
+      }
       return {
         success: true,
         data: auctions,
+        nextCursor,
       };
     }),
   getMyAuctions: protectedProcedure
     .input(
       z.object({
         status: z.string().nullish(),
-        offset: z.number().nullish(),
-        limit: z.number().nullish(),
+        limit: z.number().min(1).max(100).default(12),
+        cursor: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const { cursor, status, limit } = input;
       const whereClause = [];
-      if (input.status) {
-        whereClause.push({ status: input.status });
+      if (status) {
+        whereClause.push({ status });
       } else {
         whereClause.push({
           status: {
@@ -176,7 +185,6 @@ export const auctionRouter = createTRPCRouter({
           },
         });
       }
-      whereClause.push({ creatorId: ctx.session.user.id });
 
       const auctions = await ctx.prisma.auction.findMany({
         orderBy: { createdAt: "desc" },
@@ -214,29 +222,36 @@ export const auctionRouter = createTRPCRouter({
             },
           },
         },
-        take: input.limit || 12, // default 12
-        skip: input.offset || 0,
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
         where:
           whereClause.length > 0
             ? {
-                AND: whereClause,
+                AND: [...whereClause, { creatorId: ctx.session.user.id }],
               }
-            : undefined,
+            : { creatorId: ctx.session.user.id },
       });
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (auctions.length > limit) {
+        const nextItem = auctions.pop(); // return the last item from the array
+        nextCursor = nextItem?.id;
+      }
       return {
         success: true,
         data: auctions,
+        nextCursor,
       };
     }),
   getBidAuctions: protectedProcedure
     .input(
       z.object({
         status: z.string().nullish(),
-        offset: z.number().nullish(),
-        limit: z.number().nullish(),
+        limit: z.number().min(1).max(100).default(12),
+        cursor: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const { cursor, status, limit } = input;
       const bids = await ctx.prisma.bid.findMany({
         where: {
           bidderId: ctx.session.user.id,
@@ -245,10 +260,10 @@ export const auctionRouter = createTRPCRouter({
           auctionId: true,
         },
       });
-      console.log(bids)
+
       const whereClause = [];
-      if (input.status && PUBLIC_STATUS.indexOf(input.status) > -1) {
-        whereClause.push({ status: input.status });
+      if (status && PUBLIC_STATUS.indexOf(status) > -1) {
+        whereClause.push({ status });
       } else {
         whereClause.push({
           status: {
@@ -293,8 +308,8 @@ export const auctionRouter = createTRPCRouter({
             },
           },
         },
-        take: input.limit || 12, // default 12
-        skip: input.offset || 0,
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
         where:
           whereClause.length > 0
             ? {
@@ -313,9 +328,15 @@ export const auctionRouter = createTRPCRouter({
               },
             },
       });
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (auctions.length > limit) {
+        const nextItem = auctions.pop(); // return the last item from the array
+        nextCursor = nextItem?.id;
+      }
       return {
         success: true,
         data: auctions,
+        nextCursor,
       };
     }),
   onAuctionChange: publicProcedure

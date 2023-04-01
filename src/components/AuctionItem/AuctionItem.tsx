@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { TbLoader2, TbUsers } from "react-icons/tb";
+import { TbChessQueen, TbLoader2, TbUsers } from "react-icons/tb";
 import AuctionStatus from "./AuctionStatus";
 import { AUCTION_STATUS } from "~/constants/auction";
 import AuctionTimer from "./AuctionTimer";
@@ -70,21 +70,18 @@ export default function AuctionItem(props: AuctionItemProps) {
   return (
     <div className="w-56 rounded-lg border border-gray-200 bg-white">
       <div
-        className="flex items-center justify-center rounded-t-lg"
+        className="flex items-center justify-center rounded-t-lg relative"
         style={{
           height: 222,
           width: 222,
         }}
       >
         <Image
-          style={{
-            height: 222,
-          }}
-          className="w-auto rounded-t-lg"
           src={auction.image}
           alt={auction.title}
-          height={222}
-          width={222}
+          fill
+          sizes="222px"
+          style={{objectFit: 'cover'}}
         />
       </div>
       <div className="px-4 pb-4 pt-2">
@@ -100,7 +97,7 @@ export default function AuctionItem(props: AuctionItemProps) {
           {auction.title}
         </div>
         <div className="mb-1 flex flex-row items-end text-sm text-gray-800">
-          <span className="flex-1">Current price:</span>
+          <span className="flex-1">Current price</span>
           <span className="text-lg font-semibold">${auction.currentPrice}</span>
         </div>
         <div className="flex h-8 flex-row items-center">
@@ -113,8 +110,8 @@ export default function AuctionItem(props: AuctionItemProps) {
               />
             </div>
           ) : (
-            <div className="text-sm text-gray-600 line-clamp-1">
-              Winner: {auction.winner?.name || "-"}
+            <div className="text-sm text-gray-600 flex flex-row items-center">
+              <TbChessQueen className="mr-1 text-yellow-500" /> <div className="line-clamp-1">{auction.winner?.name || "-"}</div>
             </div>
           )}
           {sessioData?.user.id &&
@@ -145,7 +142,7 @@ export default function AuctionItem(props: AuctionItemProps) {
           <div className="text-sm text-gray-600">
             {auction.bids?.[0].amount !== auction.currentPrice
               ? "Outbidded!"
-              : "You are last bidder!"}
+              : auction.winnerId && auction.winnerId === sessioData?.user.id ? "Winner!" : "You are last bidder!"}
           </div>
         ) : null}
       </div>

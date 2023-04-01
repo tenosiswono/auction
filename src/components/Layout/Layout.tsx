@@ -11,6 +11,7 @@ import {
   TbLogout,
 } from "react-icons/tb";
 import DepositBallance from "../Deposit/DepositBallance";
+import { useRouter } from "next/router";
 
 export default function Layout({
   children,
@@ -22,6 +23,7 @@ export default function Layout({
   description?: string;
 }) {
   const { data: sessionData, status } = useSession();
+  const router = useRouter();
 
   const onSignout = async () => {
     await signOut();
@@ -85,7 +87,8 @@ export default function Layout({
               <li>
                 <Link
                   href="/auctions"
-                  className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                  data-active={router.pathname === "/auctions"}
+                  className="nav-item"
                 >
                   <TbHammer size={24} />
                   <span className="ml-3">Auctions</span>
@@ -113,7 +116,8 @@ export default function Layout({
                   <li>
                     <Link
                       href="/auctions/bid"
-                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                      data-active={router.pathname === "/auctions/bid"}
+                      className="nav-item"
                     >
                       <TbBookmarks size={24} />
                       <span className="ml-3">Bid Auctions</span>
@@ -122,7 +126,8 @@ export default function Layout({
                   <li>
                     <Link
                       href="/auctions/me"
-                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                      data-active={router.pathname === "/auctions/me"}
+                      className="nav-item"
                     >
                       <TbHandStop size={24} />
                       <span className="ml-3">My Auctions</span>
@@ -131,6 +136,7 @@ export default function Layout({
                   <li>
                     <Link
                       href="/auctions/new"
+                      data-active={router.pathname === "/auctions/new"}
                       className="btn btn-primary block"
                     >
                       Start a new auction
@@ -147,10 +153,7 @@ export default function Layout({
                   </li>
                   <DepositBallance />
                   <li>
-                    <a
-                      href="#"
-                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
-                    >
+                    <a href="#" className="nav-item">
                       <Image
                         className="h-6 w-6 rounded-full"
                         width={24}
@@ -166,7 +169,8 @@ export default function Layout({
                   <li>
                     <Link
                       href="/deposits"
-                      className="flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100"
+                      data-active={router.pathname === "/deposits"}
+                      className="nav-item"
                     >
                       <TbPigMoney size={24} />
                       <span className="ml-3">Deposit Histories</span>

@@ -24,6 +24,9 @@
   .tab-nav {
     @apply inline-block rounded-t-lg border-b-2 hover:border-gray-300 hover:text-gray-600 data-[active=true]:border-orange-600 p-4 data-[active=true]:text-orange-600
   }
+  .nav-item {
+    @apply flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100 data-[active=true]:bg-orange-200
+  }
 }
 
 .main-container {
