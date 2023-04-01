@@ -10,8 +10,8 @@ export default function DepositBallance() {
   const { data, isLoading } = api.user.getDepositBallance.useQuery();
 
   useEffect(() => {
-    const priv = privateChannel?.bind('update-deposit', (data: { amount: number}) => {
-      setBallance(data.amount)
+    const priv = privateChannel?.bind('update-deposit', (data: { deposit: number}) => {
+      setBallance(data.deposit)
     })
     return () => {
       priv?.unbind()

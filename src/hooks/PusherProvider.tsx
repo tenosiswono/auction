@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Pusher, { type Channel } from "pusher-js";
@@ -21,29 +22,34 @@ type PusherProviderProps = {
 };
 
 const PusherProvider = ({ children }: PusherProviderProps) => {
-  const pusherClient = useMemo(() => {
-    return new Pusher(env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: env.NEXT_PUBLIC_PUSHER_CLUSTER,
-      authEndpoint: "/api/pusher/auth-user",
-    });
-  }, []);
+  const pusherClient = useRef<Pusher>()
+  useEffect(() => {
+    if (!pusherClient.current) {
+      pusherClient.current = new Pusher(env.NEXT_PUBLIC_PUSHER_KEY, {
+        cluster: env.NEXT_PUBLIC_PUSHER_CLUSTER,
+        authEndpoint: "/api/pusher/auth-user",
+      });
+    }
+  }, [])
   const { data: sessionData } = useSession();
   const [privateChannel, setPrivateChannel] = useState<Channel | undefined>();
   const [publicChannel, setPublicChannel] = useState<Channel | undefined>();
   useEffect(() => {
-    pusherClient.connect();
-    if (sessionData?.user.id) {
-      setPrivateChannel(
-        pusherClient.subscribe(`private-user-${sessionData.user.id}`)
-      );
+    if (pusherClient.current) {
+      pusherClient.current.connect();
+      if (sessionData?.user.id) {
+        setPrivateChannel(
+          pusherClient.current.subscribe(`private-user-${sessionData.user.id}`)
+        );
+      }
+      setPublicChannel(pusherClient.current.subscribe(`public-auction`));
+      return () => {
+        setPrivateChannel(undefined);
+        setPublicChannel(undefined);
+        pusherClient?.current?.disconnect();
+      };
     }
-    setPublicChannel(pusherClient.subscribe(`public-auction`));
-    return () => {
-      setPrivateChannel(undefined);
-      setPublicChannel(undefined);
-      pusherClient.disconnect();
-    };
-  }, [pusherClient, sessionData?.user.id]);
+  }, [sessionData?.user.id]);
   return (
     <PusherContext.Provider
       value={{
