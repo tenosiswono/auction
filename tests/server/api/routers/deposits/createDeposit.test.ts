@@ -27,7 +27,7 @@ describe("createDeposit", () => {
   });
 
   it("able to get create deposit", async () => {
-    const date = new Date(2000, 1, 1, 13, 0, 0);
+    const date = new Date(1680379656829);
     vi.setSystemTime(date);
     prismaMock.user.findFirst.mockResolvedValueOnce({
       id: "dep",
@@ -68,10 +68,10 @@ describe("createDeposit", () => {
       {
         "data": {
           "amount": 1000,
-          "createdAt": 2000-02-01T06:00:00.000Z,
+          "createdAt": 2023-04-01T20:07:36.829Z,
           "id": "dep1",
           "status": "credit",
-          "updatedAt": 2000-02-01T06:00:00.000Z,
+          "updatedAt": 2023-04-01T20:07:36.829Z,
           "userId": "dep",
         },
         "success": true,

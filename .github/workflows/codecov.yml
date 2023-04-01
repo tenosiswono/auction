@@ -1,5 +1,22 @@
 name: CI/CD
 
+env:
+  NODE_ENV: test
+  DATABASE_URL: postgres://test:test@db.test.test.co:5432/postgres
+  NEXTAUTH_URL: http://localhost:3000"
+  NEXTAUTH_SECRET: test
+  SUPABASE_DOMAIN: test.supabase.co
+  SUPABASE_URL: https://test.supabase.co
+  SUPABASE_KEY: test
+  SUPABASE_BUCKET: upload
+  IMAGE_SERVER: https://test.supabase.co/storage/v1/object/public/upload
+  INNGEST_EVENT_KEY: test
+  INNGEST_SIGNING_KEY: signkey-test-test
+  PUSHER_APP_ID: test
+  NEXT_PUBLIC_PUSHER_KEY: test
+  PUSHER_SECRET: test
+  NEXT_PUBLIC_PUSHER_CLUSTER: test
+
 on:
   push:
     branches: [ main ]
@@ -21,7 +38,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -50,7 +67,7 @@ jobs:
     needs: install-deps
     steps:
       - name: Restore cached dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: restore-deps
         with:
           path: "."
@@ -72,7 +89,7 @@ jobs:
     needs: install-deps
     steps:
       - name: Restore cached dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: restore-deps
         with:
           path: "."

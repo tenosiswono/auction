@@ -26,8 +26,8 @@ describe("createBid", () => {
     vi.useRealTimers();
   });
   it("able to get create bid", async () => {
-    const date = new Date(2000, 1, 1, 13, 0, 0);
-    const endDate = new Date(2000, 1, 1, 16, 0, 0);
+    const date = new Date(1680379656829);
+    const endDate = new Date(1680379666829);
     vi.setSystemTime(date);
     prismaMock.auction.findFirst.mockResolvedValueOnce({
       id: "auctionId",
@@ -80,7 +80,7 @@ describe("createBid", () => {
         "data": {
           "amount": 1001,
           "id": "bid",
-          "updatedAt": 2000-02-01T06:00:00.000Z,
+          "updatedAt": 2023-04-01T20:07:36.829Z,
         },
         "success": true,
       }
