@@ -3,7 +3,7 @@ name: CI/CD
 env:
   NODE_ENV: test
   DATABASE_URL: postgres://test:test@db.test.test.co:5432/postgres
-  NEXTAUTH_URL: http://localhost:3000"
+  NEXTAUTH_URL: http://localhost:3000
   NEXTAUTH_SECRET: test
   SUPABASE_DOMAIN: test.supabase.co
   SUPABASE_URL: https://test.supabase.co
