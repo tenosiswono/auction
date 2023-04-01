@@ -23,3 +23,12 @@ vi.mock("~/utils/pusher", () => ({
     trigger: vi.fn()
   }
 }))
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: {
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn()
+      }))
+    }
+  }
+}))
