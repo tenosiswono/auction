@@ -28,15 +28,31 @@ export const finishAuction = inngest.createFunction(
           if (moment().isAfter(moment(auction.endDate))) {
             await Promise.all(auction.bids.sort((a, b) => b.amount - a.amount).map( async (bid, index) => {
               if (index === 0) {
-                await prisma.auction.update({
+                const auction = await prisma.auction.update({
                   where: {
                     id: event.data.id
                   },
                   data: {
                     winnerId: bid.bidderId || null,
                     status: AUCTION_STATUS.completed
+                  },
+                  select: {
+                    winner: {
+                      select: {
+                        name: true,
+                        id: true
+                      }
+                    },
+                    status: true,
+                    winnerId: true,
+                    id: true,
                   }
                 })
+                void pusherServer.trigger(`public-auction`, `update-auction-${auction.id}`, {
+                  winnerId: auction.winnerId,
+                  status: auction.status,
+                  winner: auction.winner
+                });
               } else {
                 // return bid to deposit
                 const user = await prisma.user.findFirst({

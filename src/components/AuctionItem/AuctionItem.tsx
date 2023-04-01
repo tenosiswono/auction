@@ -27,15 +27,33 @@ export default function AuctionItem(props: AuctionItemProps) {
 
   useEffect(() => {
     const pub = publicChannel?.bind(
-      "update-auction",
-      (data: { currentPrice: number; bids: number }) => {
-        const newAuction: GetAuctionResponse = {
-          ...auctionRef.current,
-          currentPrice: data.currentPrice,
-          _count: {
-            bids: data.bids,
-          },
-        };
+      `update-auction-${auction.id}`,
+      (data: {
+        currentPrice?: number;
+        bids?: number;
+        winnerId?: string;
+        status?: string;
+        winner?: {
+          id: string;
+          name: string | null;
+        } | null;
+      }) => {
+        const newAuction: GetAuctionResponse = auctionRef.current;
+        if (data.currentPrice) {
+          newAuction.currentPrice = data.currentPrice;
+        }
+        if (data.bids) {
+          newAuction._count.bids = data.bids;
+        }
+        if (data.winnerId) {
+          newAuction.winnerId = data.winnerId;
+        }
+        if (data.status) {
+          newAuction.status = data.status;
+        }
+        if (data.winner) {
+          newAuction.winner = data.winner;
+        }
         auctionRef.current = newAuction;
         setAuction(newAuction);
       }
@@ -43,7 +61,7 @@ export default function AuctionItem(props: AuctionItemProps) {
     return () => {
       pub?.unbind();
     };
-  }, [publicChannel]);
+  }, [auction.id, publicChannel]);
 
   useEffect(() => {
     setAuction(data);

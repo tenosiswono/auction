@@ -1,10 +1,7 @@
 import moment from "moment";
 import { AUCTION_STATUS } from "~/constants/auction";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { pusherServer } from "~/utils/pusher";
 import { type GetAuctionResponse } from "../auctions/auctionRouter";
 
@@ -178,17 +175,21 @@ export const bidRouter = createTRPCRouter({
       ]);
       const auctionUpdate = transactionResults[3] as GetAuctionResponse;
       const bid = transactionResults[0] as {
-        id: string,
-        updatedAt: Date,
-        amount: number,
-      }
-      void pusherServer.trigger(`public-auction`, "update-auction", {
-        currentPrice: auctionUpdate.currentPrice,
-        bids: auctionUpdate._count.bids,
-      });
+        id: string;
+        updatedAt: Date;
+        amount: number;
+      };
+      void pusherServer.trigger(
+        "public-auction",
+        `update-auction-${auctionUpdate.id}`,
+        {
+          currentPrice: auctionUpdate.currentPrice,
+          bids: auctionUpdate._count.bids,
+        }
+      );
       return {
         success: true,
-        data: bid
+        data: bid,
       };
     }),
 });
