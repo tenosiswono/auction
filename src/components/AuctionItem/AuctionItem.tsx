@@ -10,6 +10,7 @@ import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRo
 import { useRouter } from "next/router";
 import BidButton from "../Bid/BidButton";
 import moment from "moment";
+import { usePusher } from "~/hooks/PusherProvider";
 
 type AuctionItemProps = {
   data: GetAuctionResponse;
@@ -18,32 +19,54 @@ type AuctionItemProps = {
 export default function AuctionItem(props: AuctionItemProps) {
   const { data } = props;
   const { data: sessioData } = useSession();
+  const { publicChannel, privateChannel } = usePusher();
   const [auction, setAuction] = useState(data);
   // auctionRef for subscription to work properly
   const auctionRef = useRef(data);
   const router = useRouter();
 
-  api.auction.onAuctionChange.useSubscription(
-    { auctionId: auction.id },
-    {
-      onData: (data) => {
+  useEffect(() => {
+    const pub = publicChannel?.bind(
+      "update-auction",
+      (data: { currentPrice: number; bids: number }) => {
         const newAuction: GetAuctionResponse = {
           ...auctionRef.current,
           currentPrice: data.currentPrice,
           _count: {
-            bids: data._count.bids,
+            bids: data.bids,
           },
-          ...(data.bids
-            ? {
-                bids: data.bids,
-              }
-            : {}),
         };
         auctionRef.current = newAuction;
         setAuction(newAuction);
-      },
-    }
-  );
+      }
+    );
+    return () => {
+      pub?.unbind();
+    };
+  }, [publicChannel]);
+  useEffect(() => {
+    const priv = privateChannel?.bind(
+      `update-bid-auction-${auction.id}`,
+      (data: {
+        bids: {
+          updatedAt: string;
+          amount: number;
+          bidderId: string;
+          id: string;
+        }[];
+      }) => {
+        const newAuction: GetAuctionResponse = {
+          ...auctionRef.current,
+          bids: data.bids.map(bid => ({...bid, updatedAt: new Date(bid.updatedAt)})),
+        };
+        auctionRef.current = newAuction;
+        setAuction(newAuction);
+      }
+    );
+    return () => {
+      priv?.unbind();
+    };
+  });
 
   useEffect(() => {
     setAuction(data);
@@ -68,17 +91,17 @@ export default function AuctionItem(props: AuctionItemProps) {
   let extendStatus = auction.status;
   if (auction.bids?.[0]) {
     if (auction.bids?.[0].amount !== auction.currentPrice) {
-      extendStatus = "Outbidded!"
+      extendStatus = "Outbidded!";
     } else if (auction.winnerId && auction.winnerId === sessioData?.user.id) {
-      extendStatus = "Winner!"
+      extendStatus = "Winner!";
     } else {
-      extendStatus = "Outbid!"
+      extendStatus = "Outbid!";
     }
   }
   return (
     <div className="w-56 rounded-lg border border-gray-200 bg-white">
       <div
-        className="flex items-center justify-center rounded-t-lg relative"
+        className="relative flex items-center justify-center rounded-t-lg"
         style={{
           height: 222,
           width: 222,
@@ -89,7 +112,7 @@ export default function AuctionItem(props: AuctionItemProps) {
           alt={auction.title}
           fill
           sizes="222px"
-          style={{objectFit: 'cover'}}
+          style={{ objectFit: "cover" }}
         />
       </div>
       <div className="px-4 pb-4 pt-2">
@@ -118,8 +141,9 @@ export default function AuctionItem(props: AuctionItemProps) {
               />
             </div>
           ) : (
-            <div className="text-sm text-gray-600 flex flex-row items-center">
-              <TbChessQueen className="mr-1 text-yellow-500" /> <div className="line-clamp-1">{auction.winner?.name || "-"}</div>
+            <div className="flex flex-row items-center text-sm text-gray-600">
+              <TbChessQueen className="mr-1 text-yellow-500" />{" "}
+              <div className="line-clamp-1">{auction.winner?.name || "-"}</div>
             </div>
           )}
           {sessioData?.user.id &&

@@ -23,7 +23,9 @@ const server = z.object({
   SUPABASE_BUCKET: z.string(),
   IMAGE_SERVER: z.string().url(),
   INNGEST_EVENT_KEY: z.string(),
-  INNGEST_SIGNING_KEY: z.string()
+  INNGEST_SIGNING_KEY: z.string(),
+  PUSHER_APP_ID: z.string(),
+  PUSHER_SECRET: z.string(),
 });
 
 /**
@@ -31,7 +33,9 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-  // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+  // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),,
+  NEXT_PUBLIC_PUSHER_CLUSTER: z.string(),
+  NEXT_PUBLIC_PUSHER_KEY: z.string(),
 });
 
 /**
@@ -51,6 +55,10 @@ const processEnv = {
   IMAGE_SERVER: process.env.IMAGE_SERVER,
   INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
   INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+  PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+  NEXT_PUBLIC_PUSHER_KEY: process.env.NEXT_PUBLIC_PUSHER_KEY,
+  PUSHER_SECRET: process.env.PUSHER_SECRET,
+  NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
 };
 
 // Don't touch the part below
@@ -58,29 +66,29 @@ const processEnv = {
 
 const merged = server.merge(client);
 
-type MergedInput = z.input<typeof merged>;
-type MergedOutput = z.infer<typeof merged>;
-type MergedSafeParseReturn = z.SafeParseReturnType<MergedInput, MergedOutput>;
+/** @typedef {z.input<typeof merged>} MergedInput */
+/** @typedef {z.infer<typeof merged>} MergedOutput */
+/** @typedef {z.SafeParseReturnType<MergedInput, MergedOutput>} MergedSafeParseReturn */
 
-let env =  process.env as MergedOutput;
+let env = /** @type {MergedOutput} */ (process.env);
 
 if (!!process.env.SKIP_ENV_VALIDATION == false) {
   const isServer = typeof window === "undefined";
 
-  const parsed = (isServer
-    ? merged.safeParse(processEnv) // on server we can validate all env vars
-    : client.safeParse(processEnv)) as MergedSafeParseReturn; // on client we can only validate the ones that are exposed
+  const parsed = /** @type {MergedSafeParseReturn} */ (
+    isServer
+      ? merged.safeParse(processEnv) // on server we can validate all env vars
+      : client.safeParse(processEnv) // on client we can only validate the ones that are exposed
+  );
 
   if (parsed.success === false) {
     console.error(
       "❌ Invalid environment variables:",
-      parsed.error.flatten().fieldErrors
+      parsed.error.flatten().fieldErrors,
     );
     throw new Error("Invalid environment variables");
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   env = new Proxy(parsed.data, {
     get(target, prop) {
       if (typeof prop !== "string") return undefined;
@@ -90,12 +98,9 @@ if (!!process.env.SKIP_ENV_VALIDATION == false) {
         throw new Error(
           process.env.NODE_ENV === "production"
             ? "❌ Attempted to access a server-side environment variable on the client"
-            : `❌ Attempted to access server-side environment variable '${prop}' on the client`
+            : `❌ Attempted to access server-side environment variable '${prop}' on the client`,
         );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return target[/** @type {keyof typeof target} */ prop];
+      return target[/** @type {keyof typeof target} */ (prop)];
     },
   });
 }

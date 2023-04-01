@@ -15,9 +15,6 @@ vi.mock("~/utils/api", () => ({
       getDepositBallance: {
         useQuery: vi.fn(() => ({ data: { deposit: 100 } })),
       },
-      onDepositChange: {
-        useSubscription: vi.fn(),
-      },
     },
     deposit: {
       createDeposit: {

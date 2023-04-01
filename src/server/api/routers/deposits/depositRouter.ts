@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { pusherServer } from "~/utils/pusher";
 
 export const depositRouter = createTRPCRouter({
   createDeposit: protectedProcedure
@@ -30,8 +31,10 @@ export const depositRouter = createTRPCRouter({
           },
         }),
       ]);
-
-      ctx.ee.emit("onDepositChange", user);
+      
+      void pusherServer.trigger(`private-user-${ctx.session.user.id}`, 'update-deposit', {
+        deposit: user.deposit
+      })
 
       return {
         success: true,

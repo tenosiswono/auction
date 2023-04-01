@@ -1,4 +1,9 @@
-import { getSession } from 'next-auth/react';
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+import { ZodError } from "zod";
+import { type PrismaClient } from '@prisma/client';
+import { getServerAuthSession } from "~/server/auth";
+
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1).
@@ -19,14 +24,11 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
 import { prisma } from "~/server/db";
-import { EventEmitter } from 'events';
 
 type CreateContextOptions = {
   session: Session | null;
   prisma?: PrismaClient;
 };
-
-export const ee = new EventEmitter();
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -42,7 +44,6 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma: opts.prisma || prisma,
-    ee,
   };
 };
 
@@ -52,11 +53,11 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions
-  | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>) => {
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+  const { req, res } = opts;
+
   // Get the session from the server using the getServerSession wrapper function
-  const req = opts?.req;
-  const session =  await getSession({ req });
+  const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
     session,
@@ -70,13 +71,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-import { ZodError } from "zod";
-import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
-import { type IncomingMessage } from "http";
-import type ws from "ws";
-import { type PrismaClient } from '@prisma/client';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

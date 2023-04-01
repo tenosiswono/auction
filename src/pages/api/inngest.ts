@@ -3,9 +3,9 @@ import { AUCTION_STATUS } from '~/constants/auction';
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
 import moment from "moment";
-import { env } from "~/env";
+import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
-import { ee } from '~/server/api/trpc';
+import { pusherServer } from '~/utils/pusher';
 
 export const inngest = new Inngest({ name: "AuctionHive", eventKey: env.INNGEST_EVENT_KEY });
 
@@ -68,7 +68,10 @@ export const finishAuction = inngest.createFunction(
                     }
                   })
                 ])
-                ee.emit("onDepositChange", userUpdate)
+
+                void pusherServer.trigger(`private-user-${bid.bidderId}`, 'update-deposit', {
+                  deposit: userUpdate.deposit
+                })
               }
             }))
           }

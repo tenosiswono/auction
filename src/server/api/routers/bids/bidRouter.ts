@@ -8,6 +8,8 @@ import {
 } from "~/server/api/trpc";
 import { type Bid } from "@prisma/client";
 import { observable } from "@trpc/server/observable";
+import { pusherServer } from "~/utils/pusher";
+import { GetAuctionResponse } from "../auctions/auctionRouter";
 
 export const bidRouter = createTRPCRouter({
   createBid: protectedProcedure
@@ -96,7 +98,8 @@ export const bidRouter = createTRPCRouter({
           },
         ]);
       }
-      const [, userUpdate, , auctionUpdate] = await ctx.prisma.$transaction([
+
+      const transactionResults = await ctx.prisma.$transaction([
         ...(userBid
           ? [
               ctx.prisma.bid.update({
@@ -164,7 +167,7 @@ export const bidRouter = createTRPCRouter({
                 bidderId: true,
                 updatedAt: true,
                 amount: true,
-                id: true
+                id: true,
               },
             },
             currentPrice: true,
@@ -172,31 +175,20 @@ export const bidRouter = createTRPCRouter({
           },
         }),
       ]);
-
-      ctx.ee.emit("onDepositChange", userUpdate);
-      ctx.ee.emit("onAuctionChange", auctionUpdate);
-
+      const auctionUpdate = transactionResults[3] as GetAuctionResponse;
+      void pusherServer.trigger(`public-auction`, "update-auction", {
+        currentPrice: auctionUpdate.currentPrice,
+        bids: auctionUpdate._count.bids,
+      });
+      void pusherServer.trigger(
+        `private-user-${ctx.session.user.id}`,
+        `update-bid-auction-${auctionUpdate.id}`,
+        {
+          bids: auctionUpdate.bids
+        }
+      );
       return {
         success: true,
       };
-    }),
-  onBidChange: publicProcedure
-    .input(
-      z.object({
-        bidId: z.string().nullish(),
-      })
-    )
-    .subscription(({ ctx, input }) => {
-      return observable<Bid>((emit) => {
-        const onBiChange = (data: Bid) => {
-          if (data.id === input.bidId) {
-            emit.next(data);
-          }
-        };
-        ctx.ee.on("onBidChange", onBiChange);
-        return () => {
-          ctx.ee.off("onBidChange", onBiChange);
-        };
-      });
     }),
 });

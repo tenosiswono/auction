@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import DepositButton from "./DepositButton";
 import { api } from "~/utils/api";
+import { usePusher } from "~/hooks/PusherProvider";
 
 export default function DepositBallance() {
   const [ballance, setBallance] = useState<number>(0);
+  const { privateChannel, publicChannel } = usePusher()
 
   const { data, isLoading } = api.user.getDepositBallance.useQuery();
 
-  api.user.onDepositChange.useSubscription(undefined, {
-    onData(data) {
-      setBallance(data.deposit);
-    },
-  });
-
+  useEffect(() => {
+    const priv = privateChannel?.bind('update-deposit', (data: { amount: number}) => {
+      setBallance(data.amount)
+    })
+    return () => {
+      priv?.unbind()
+    }
+  }, [privateChannel, publicChannel])
+  
   useEffect(() => {
     setBallance(data?.deposit || 0);
   }, [data?.deposit]);

@@ -39,6 +39,14 @@ Edit the environment file and fill in coresponding `#inngest` env from [Inngest]
 INNGEST_EVENT_KEY="local"
 INNGEST_SIGNING_KEY=<your-signing-key>
 ```
+Edit the environment file and fill in coresponding `#pusher` env from [Pusher](https://pusher.com/) project 
+```bash
+#pusher
+PUSHER_APP_ID=""
+NEXT_PUBLIC_PUSHER_KEY=""
+PUSHER_SECRET=""
+NEXT_PUBLIC_PUSHER_CLUSTER=""
+```
 Migrate Prisma DB
 ```bash
 npx prisma migrate dev
@@ -46,10 +54,6 @@ npx prisma migrate dev
 Start the web development server.
 ```bash
 npm run dev
-```
-Start the websocket development server.
-```bash
-npm run dev:ws
 ```
 Open on your browser `http://localhost:3000`
 ## Test
@@ -82,7 +86,7 @@ npm run lint
 - [Supabase](https://supabase.com/) Uploading Image, and Postgres Server
 - [Inngest](https://www.inngest.com/) Ship Background Jobs, Crons, Webhooks, and Workflows
 - [Vitest](https://vitest.dev/) Test Framework
-- Websocket to handle realtime data in auction
+- [Pusher](https://pusher.com/) Websocket to handle realtime data
 
 ### ERD
 ```mermaid

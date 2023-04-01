@@ -11,9 +11,6 @@ vi.mock("~/utils/api", () => ({
       getDepositBallance: {
         useQuery: vi.fn(() => ({ data: { deposit: 100 } })),
       },
-      onDepositChange: {
-        useSubscription: vi.fn()
-      },
     },
     deposit: {
       createDeposit: {
@@ -57,8 +54,5 @@ describe("DepositBalance component", () => {
     await waitFor(() => {
       expect(screen.queryByTestId('deposit-modal')).not.toBeInTheDocument()
     })
-  });
-  test("renders event onDepositChange", () => {
-    render(<DepositBalance />);
   });
 });

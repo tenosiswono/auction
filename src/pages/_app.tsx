@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import 'flowbite';
+import { PusherProvider } from "~/hooks/PusherProvider";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -13,7 +14,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <PusherProvider>
+        <Component {...pageProps} />
+      </PusherProvider>
     </SessionProvider>
   );
 };

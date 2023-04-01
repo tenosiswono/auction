@@ -44,8 +44,7 @@ export default function SignIn() {
         message: "Email or Password doesnt match",
       });
     } else {
-      // need to hard reload for ws
-      location.href = "/";
+      void push("/");
     }
   };
 

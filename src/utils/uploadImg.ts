@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@supabase/supabase-js";
-import { env } from "~/env";
+import { env } from "~/env.mjs";
 
 const supabase = createClient<any>(env.SUPABASE_URL, env.SUPABASE_KEY);
 

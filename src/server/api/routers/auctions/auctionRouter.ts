@@ -340,32 +340,6 @@ export const auctionRouter = createTRPCRouter({
         nextCursor,
       };
     }),
-  onAuctionChange: publicProcedure
-    .input(
-      z.object({
-        auctionId: z.string().nullish(),
-      })
-    )
-    .subscription(({ ctx, input }) => {
-      return observable<GetAuctionResponse>((emit) => {
-        const onAuctionChange = (data: GetAuctionResponse) => {
-          if (data.id === input.auctionId) {
-            if (data.bids?.[0]?.bidderId === ctx.session?.user.id) {
-              emit.next(data);
-            } else {
-              emit.next({
-                ...data,
-                bids: undefined,
-              });
-            }
-          }
-        };
-        ctx.ee.on("onAuctionChange", onAuctionChange);
-        return () => {
-          ctx.ee.off("onAuctionChange", onAuctionChange);
-        };
-      });
-    }),
 });
 
 export type GetAuctionResponse = Auction & {

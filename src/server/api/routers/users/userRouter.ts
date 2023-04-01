@@ -6,7 +6,6 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { observable } from "@trpc/server/observable";
 import { removeProperties } from "~/utils/api";
 
 export const userRouter = createTRPCRouter({
@@ -40,19 +39,6 @@ export const userRouter = createTRPCRouter({
       where: { id: ctx.session.user.id },
     });
     return { success: true, deposit: user?.deposit, id: ctx.session.user.id };
-  }),
-  onDepositChange: protectedProcedure.subscription(({ctx}) => {
-    return observable<User>((emit) => {
-      const onDepositChange = (data: User) => {
-        if (data.id === ctx.session.user.id) {
-          emit.next(removeProperties(data));
-        }
-      };
-      ctx.ee.on('onDepositChange', onDepositChange);
-      return () => {
-        ctx.ee.off('onDepositChange', onDepositChange);
-      };
-    })
   }),
   createUser: publicProcedure
     .input(

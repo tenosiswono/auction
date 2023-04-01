@@ -16,9 +16,6 @@ vi.mock("next/router", () => ({
 vi.mock("~/utils/api", () => ({
   api: {
     auction: {
-      onAuctionChange: {
-        useSubscription: vi.fn(),
-      },
       publishAuction: {
         useMutation: vi.fn(() => ({
           mutateAsync,

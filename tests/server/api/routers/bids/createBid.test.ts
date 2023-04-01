@@ -57,7 +57,11 @@ describe("createBid", () => {
       password: "",
     });
     prismaMock.$transaction.mockResolvedValueOnce([
-      {},{},{},{}
+      {},{},{},{
+        _count: {
+          bids: 0
+        }
+      }
     ]);
     const caller = appRouter.createCaller(
       createInnerTRPCContext({ session: mockUser, prisma: prismaMock })
