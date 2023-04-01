@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { expect, afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import matchers from '@testing-library/jest-dom/matchers';
+import { expect, afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import matchers from "@testing-library/jest-dom/matchers";
 
 // @ts-ignore
-globalThis.IS_REACT_ACT_ENVIRONMENT = true
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 expect.extend(matchers);
 
 afterEach(() => {
@@ -15,20 +15,20 @@ afterEach(() => {
 vi.mock("~/hooks/PusherProvider", () => ({
   usePusher: () => ({
     publicChannel: undefined,
-    privateChannel: undefined
+    privateChannel: undefined,
   }),
 }));
 vi.mock("~/utils/pusher", () => ({
   pusherServer: {
-    trigger: vi.fn()
-  }
-}))
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: {
+    trigger: vi.fn(),
+  },
+}));
+vi.mock("@supabase/supabase-js", () => ({
+  createClient: vi.fn(() => ({
     storage: {
       from: vi.fn(() => ({
-        upload: vi.fn()
-      }))
-    }
-  }
-}))
+        upload: vi.fn(),
+      })),
+    },
+  })),
+}));
