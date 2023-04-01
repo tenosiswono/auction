@@ -39,6 +39,15 @@ export const bidRouter = createTRPCRouter({
           },
         ]);
       }
+      if (auction.status !== AUCTION_STATUS.active) {
+        throw new z.ZodError([
+          {
+            path: ["auction"],
+            message: "Auction is not active",
+            code: "custom",
+          },
+        ]);
+      }
       const user = await ctx.prisma.user.findFirst({
         where: {
           id: ctx.session.user.id,
@@ -49,15 +58,6 @@ export const bidRouter = createTRPCRouter({
           {
             path: ["user"],
             message: "User is not exist",
-            code: "custom",
-          },
-        ]);
-      }
-      if (auction.status !== AUCTION_STATUS.active) {
-        throw new z.ZodError([
-          {
-            path: ["auction"],
-            message: "Auction is not active",
             code: "custom",
           },
         ]);

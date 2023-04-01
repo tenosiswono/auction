@@ -63,6 +63,7 @@ const AuctionList = (props: AuctionListProps) => {
           <div
             className="flex h-64 flex-1 flex-col items-center justify-center"
             key="empty-state"
+            data-testid="empty-state"
           >
             <TbMoodEmpty className="mb-2 h-24 w-24 text-orange-200" />
             <div className="text-xl text-gray-600">Auction is Empty</div>
@@ -71,7 +72,8 @@ const AuctionList = (props: AuctionListProps) => {
         {isFetchingNextPage ? (
           <AuctionListSkeleton prefixKey="loader-inview" />
         ) : hasNextPage ? (
-          <div ref={refInview} key="inview-anchor"></div>
+          <div ref={refInview} key="inview-anchor"
+          data-testid="inview-anchor"></div>
         ) : null}
       </div>
     </>

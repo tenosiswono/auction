@@ -3,12 +3,12 @@ import { TbLoader2 } from "react-icons/tb";
 
 const TIME_DELAY = 5 * 1000;
 
-type BidTimerProps = {
+type BidButtonTimerProps = {
   updatedAt?: Date;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function BidTimer(props: BidTimerProps) {
+export default function BidButtonTimer(props: BidButtonTimerProps) {
   const { updatedAt, setModalOpen } = props;
   const time = updatedAt ? updatedAt.getTime() + TIME_DELAY - Date.now() : 0;
   const [seconds, setSeconds] = useState(Math.floor(time / 1000));
@@ -35,6 +35,7 @@ export default function BidTimer(props: BidTimerProps) {
   return (
     <button
       className="btn btn-secondary px-3 py-2 text-xs"
+      data-testid="bid-button-timer"
       onClick={openModal}
       disabled={seconds > 0}
     >

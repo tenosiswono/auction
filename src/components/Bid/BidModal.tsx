@@ -96,7 +96,7 @@ function BidModal(props: BidModalProps) {
                     min={currentPrice}
                     className="form-input block w-full"
                     required
-                    data-testid="Bid-input"
+                    data-testid="bid-input"
                   />
                   {errors.amount ? (
                     <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -110,7 +110,7 @@ function BidModal(props: BidModalProps) {
                   type="submit"
                   disabled={isSubmitting}
                   className="btn btn-primary"
-                  data-testid="Bid-submit"
+                  data-testid="bid-submit"
                 >
                   {isSubmitting ? (
                     <TbLoader2 className="mr-3 inline h-4 w-4 animate-spin text-white" />

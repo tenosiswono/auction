@@ -5,6 +5,12 @@ export enum AUCTION_STATUS {
   completed = 'completed',
 }
 
+export enum EXTENDED_AUCTION_STATUS {
+  winner = "Winner!",
+  outbid = "Outbid!",
+  outbidded = "Outbidded!"
+}
+
 export const PUBLIC_STATUS: string[] = [
   AUCTION_STATUS.active,
   AUCTION_STATUS.completed,

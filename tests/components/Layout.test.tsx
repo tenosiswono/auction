@@ -3,6 +3,11 @@ import Layout from "~/components/Layout";
 import { describe, expect, vi } from "vitest";
 
 vi.mock("next-auth/react");
+vi.mock("next/router", () => ({
+  useRouter: () => ({
+    pathname: '/',
+  }),
+}));
 
 vi.mock("~/utils/api", () => ({
   api: {

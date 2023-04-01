@@ -2,7 +2,7 @@ import React from "react";
 
 export default function AuctionSkeleton() {
   return (
-    <div className="w-56 rounded-lg border border-gray-200 bg-white">
+    <div className="w-56 rounded-lg border border-gray-200 bg-white" data-testid="auciton-loader">
       <div className="flex h-56 w-56 items-center justify-center rounded-t-lg bg-gray-300">
         <svg
           className="h-12 w-12 text-gray-200"
@@ -44,9 +44,9 @@ type AuctionListSkeletonProps  = {
 export function AuctionListSkeleton({prefixKey}: AuctionListSkeletonProps) {
   return (
     <>
-      <AuctionSkeleton key={`loader-1-${prefixKey}`} />
-      <AuctionSkeleton key={`loader-2-${prefixKey}`} />
-      <AuctionSkeleton key={`loader-3-${prefixKey}`} />
+      <AuctionSkeleton key={`loader-1-${prefixKey}`}  />
+      <AuctionSkeleton key={`loader-2-${prefixKey}`}  />
+      <AuctionSkeleton key={`loader-3-${prefixKey}`}  />
     </>
   );
 }

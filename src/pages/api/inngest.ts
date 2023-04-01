@@ -24,7 +24,6 @@ export const finishAuction = inngest.createFunction(
             bids: true
           }
         })
-        console.log(auction)
         if (auction) {
           if (moment().isAfter(moment(auction.endDate))) {
             await Promise.all(auction.bids.sort((a, b) => b.amount - a.amount).map( async (bid, index) => {

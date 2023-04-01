@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import Home from "~/pages/index";
+import Bid from "~/pages/auctions/bid";
 import { describe, expect, vi } from "vitest";
 
 vi.mock("next/router", () => ({
@@ -12,8 +12,8 @@ vi.mock("next/router", () => ({
 vi.mock("next-auth/react", () => ({
   signOut: vi.fn(),
   useSession: () => ({
-    data: null,
-    status: "loading",
+    data: { user: { id: 10 }},
+    status: "authenticated",
     error: null,
   }),
 }));
@@ -52,18 +52,7 @@ vi.mock("~/components/AuctionList", () => {
 
 describe("Home", () => {
   it("renders the title and description", () => {
-    render(<Home />);
-    expect(
-      screen.getByRole("heading", {
-        name: /bee the highest bidder with/i,
-      })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: /join the hive and become a top bidder\. discover a new world of exciting auctions/i,
-      })
-    ).toBeInTheDocument();
-    expect(screen.getByText("How its Works")).toBeInTheDocument();
+    render(<Bid />);
     expect(screen.getByTestId("mock-auction-list")).toBeInTheDocument();
   });
 });

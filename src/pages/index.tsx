@@ -1,7 +1,6 @@
 import { type NextPage } from "next";
 import AuctionList from "~/components/AuctionList";
 import Layout from "~/components/Layout";
-import useAuctions from "~/hooks/useAuctions";
 
 const HOWS = [
   {
@@ -27,9 +26,6 @@ const HOWS = [
 ];
 
 const Home: NextPage = () => {
-  const { auctions, isLoading } = useAuctions({
-    isPrivate: false,
-  });
   return (
     <Layout>
       <div className="mb-12">
@@ -59,10 +55,7 @@ const Home: NextPage = () => {
         </div>
       </div>
       <div className="mb-12">
-        <h4 className="text-md mb-4 font-bold text-gray-800">
-          Featured Auctions
-        </h4>
-        <AuctionList isLoading={isLoading} auctions={auctions} />
+        <AuctionList page="index" title={"Featured Auctions"} />
       </div>
     </Layout>
   );

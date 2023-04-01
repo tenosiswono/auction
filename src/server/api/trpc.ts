@@ -23,6 +23,7 @@ import { EventEmitter } from 'events';
 
 type CreateContextOptions = {
   session: Session | null;
+  prisma?: PrismaClient;
 };
 
 export const ee = new EventEmitter();
@@ -37,10 +38,10 @@ export const ee = new EventEmitter();
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+export const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
-    prisma,
+    prisma: opts.prisma || prisma,
     ee,
   };
 };
@@ -75,6 +76,7 @@ import { ZodError } from "zod";
 import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
 import { type IncomingMessage } from "http";
 import type ws from "ws";
+import { type PrismaClient } from '@prisma/client';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

@@ -8,8 +8,8 @@
     "dev:ws": "ts-node-dev --project tsconfig.json --respawn -r tsconfig-paths/register --transpile-only src/server/wsServer.ts",
     "lint": "next lint",
     "start": "next start",
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "test": "SKIP_ENV_VALIDATION=true vitest",
+    "coverage": "SKIP_ENV_VALIDATION=true vitest run --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.0.0",
@@ -37,6 +37,7 @@
     "react-intersection-observer": "^9.4.3",
     "superjson": "1.12.2",
     "uuid": "^9.0.0",
+    "vitest-mock-extended": "^1.1.3",
     "ws": "^8.13.0",
     "zod": "^3.21.4"
   },

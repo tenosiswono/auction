@@ -120,7 +120,7 @@ export default function Layout({
                       className="nav-item"
                     >
                       <TbBookmarks size={24} />
-                      <span className="ml-3">Bid Auctions</span>
+                      <span className="ml-3">Bidded Auctions</span>
                     </Link>
                   </li>
                   <li>

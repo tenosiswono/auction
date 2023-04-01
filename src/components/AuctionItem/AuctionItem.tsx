@@ -21,7 +21,6 @@ export default function AuctionItem(props: AuctionItemProps) {
   const [auction, setAuction] = useState(data);
   // auctionRef for subscription to work properly
   const auctionRef = useRef(data);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   api.auction.onAuctionChange.useSubscription(
@@ -49,6 +48,7 @@ export default function AuctionItem(props: AuctionItemProps) {
   useEffect(() => {
     setAuction(data);
   }, [data]);
+
   const ownAuction = auction.creatorId === sessioData?.user.id;
 
   const publishAuction = api.auction.publishAuction.useMutation();
@@ -56,17 +56,25 @@ export default function AuctionItem(props: AuctionItemProps) {
   const onPublish = async () => {
     if (ownAuction) {
       try {
-        setLoading(true);
         await publishAuction.mutateAsync({
           id: auction.id,
         });
       } catch (e) {
         console.error(e);
       }
-      setLoading(false);
     }
     await router.push("/auctions/me?status=active");
   };
+  let extendStatus = auction.status;
+  if (auction.bids?.[0]) {
+    if (auction.bids?.[0].amount !== auction.currentPrice) {
+      extendStatus = "Outbidded!"
+    } else if (auction.winnerId && auction.winnerId === sessioData?.user.id) {
+      extendStatus = "Winner!"
+    } else {
+      extendStatus = "Outbid!"
+    }
+  }
   return (
     <div className="w-56 rounded-lg border border-gray-200 bg-white">
       <div
@@ -88,7 +96,7 @@ export default function AuctionItem(props: AuctionItemProps) {
         <div className="mb-1 flex flex-row items-center text-sm text-gray-600">
           <TbUsers className="mr-1" />
           <span className="flex-1">{auction._count.bids} bids</span>
-          <AuctionStatus status={auction.status} />
+          <AuctionStatus status={extendStatus} />
         </div>
         <div
           className="mb-2 h-14 border-b border-dashed text-lg font-semibold line-clamp-2"
@@ -127,10 +135,11 @@ export default function AuctionItem(props: AuctionItemProps) {
           {ownAuction && auction.status === AUCTION_STATUS.draft ? (
             <button
               className="btn btn-secondary w-16 px-3 py-2 text-xs"
+              data-testid="btn-publish"
               onClick={onPublish}
-              disabled={loading}
+              disabled={publishAuction.isLoading}
             >
-              {loading ? (
+              {publishAuction.isLoading ? (
                 <TbLoader2 className="mx-auto inline h-4 w-4 animate-spin " />
               ) : (
                 "Publish"
@@ -138,13 +147,6 @@ export default function AuctionItem(props: AuctionItemProps) {
             </button>
           ) : null}
         </div>
-        {auction.bids?.[0] ? (
-          <div className="text-sm text-gray-600">
-            {auction.bids?.[0].amount !== auction.currentPrice
-              ? "Outbidded!"
-              : auction.winnerId && auction.winnerId === sessioData?.user.id ? "Winner!" : "You are last bidder!"}
-          </div>
-        ) : null}
       </div>
     </div>
   );

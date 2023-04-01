@@ -37,7 +37,6 @@ export default function SignIn() {
     }
   }, [push, status]);
 
-  console.log(errors.email);
   const createUser = api.user.createUser.useMutation();
 
   const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {

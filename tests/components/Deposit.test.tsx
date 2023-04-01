@@ -1,4 +1,3 @@
-// DepositBalance.test.tsx
 import { describe, expect, vi } from "vitest";
 import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -13,7 +12,7 @@ vi.mock("~/utils/api", () => ({
         useQuery: vi.fn(() => ({ data: { deposit: 100 } })),
       },
       onDepositChange: {
-        useSubscription: vi.fn(),
+        useSubscription: vi.fn()
       },
     },
     deposit: {
@@ -34,7 +33,7 @@ describe("DepositBalance component", () => {
   });
   test("open modal", async () => {
     render(<DepositBalance />);
-    expect(screen.getByTestId('deposit-modal').classList.contains('hidden')).toBeTruthy()
+    expect(screen.queryByTestId('deposit-modal')).not.toBeInTheDocument()
     const button = screen.getByRole('button', {
       name: /\+/i,
       hidden: true
@@ -44,7 +43,7 @@ describe("DepositBalance component", () => {
       fireEvent.click(button)
     })
     await waitFor(() => {
-      expect(screen.getByTestId('deposit-modal').classList.contains('hidden')).toBeFalsy()
+      expect(screen.queryByTestId('deposit-modal')).toBeInTheDocument()
     })
     act(() => {
       fireEvent.input(screen.getByTestId('deposit-input'), {target: {value: '100'}})
@@ -56,7 +55,10 @@ describe("DepositBalance component", () => {
       })
     })
     await waitFor(() => {
-      expect(screen.getByTestId('deposit-modal').classList.contains('hidden')).toBeTruthy()
+      expect(screen.queryByTestId('deposit-modal')).not.toBeInTheDocument()
     })
+  });
+  test("renders event onDepositChange", () => {
+    render(<DepositBalance />);
   });
 });
