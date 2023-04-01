@@ -1,5 +1,7 @@
 # [AuctionHive](https://auction.teno.dev)
 
+[![codecov](https://codecov.io/gh/tenosiswono/auction/branch/main/graph/badge.svg?token=34SH7KLJZ1)](https://codecov.io/gh/tenosiswono/auction)
+
 Realtime Auction System
 
 https://auction.teno.dev
