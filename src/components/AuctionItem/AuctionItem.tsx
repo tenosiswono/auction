@@ -19,7 +19,7 @@ type AuctionItemProps = {
 export default function AuctionItem(props: AuctionItemProps) {
   const { data } = props;
   const { data: sessioData } = useSession();
-  const { publicChannel, privateChannel } = usePusher();
+  const { publicChannel } = usePusher();
   const [auction, setAuction] = useState(data);
   // auctionRef for subscription to work properly
   const auctionRef = useRef(data);
@@ -44,29 +44,6 @@ export default function AuctionItem(props: AuctionItemProps) {
       pub?.unbind();
     };
   }, [publicChannel]);
-  useEffect(() => {
-    const priv = privateChannel?.bind(
-      `update-bid-auction-${auction.id}`,
-      (data: {
-        bids: {
-          updatedAt: string;
-          amount: number;
-          bidderId: string;
-          id: string;
-        }[];
-      }) => {
-        const newAuction: GetAuctionResponse = {
-          ...auctionRef.current,
-          bids: data.bids.map(bid => ({...bid, updatedAt: new Date(bid.updatedAt)})),
-        };
-        auctionRef.current = newAuction;
-        setAuction(newAuction);
-      }
-    );
-    return () => {
-      priv?.unbind();
-    };
-  });
 
   useEffect(() => {
     setAuction(data);

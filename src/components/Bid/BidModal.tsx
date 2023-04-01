@@ -12,6 +12,7 @@ type BidModalProps = {
   auctionId: string;
   currentPrice: number;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurUpdatedAt:  React.Dispatch<React.SetStateAction<Date | undefined>>;
 };
 
 const validationSchema = z.object({
@@ -21,7 +22,7 @@ const validationSchema = z.object({
 type ValidationSchema = z.infer<typeof validationSchema>;
 
 function BidModal(props: BidModalProps) {
-  const { auctionId, currentPrice, setModalOpen } = props;
+  const { auctionId, currentPrice, setModalOpen, setCurUpdatedAt } = props;
   const {
     register,
     handleSubmit,
@@ -40,10 +41,11 @@ function BidModal(props: BidModalProps) {
 
   const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
     try {
-      await createBid.mutateAsync({
+      const res = await createBid.mutateAsync({
         amount: data.amount,
         auctionId: auctionId,
       });
+      setCurUpdatedAt(res.data.updatedAt)
       reset();
       closeModal();
     } catch (e) {

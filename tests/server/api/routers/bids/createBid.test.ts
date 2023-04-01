@@ -57,7 +57,11 @@ describe("createBid", () => {
       password: "",
     });
     prismaMock.$transaction.mockResolvedValueOnce([
-      {},{},{},{
+      {
+        id: 'bid',
+        amount: 1001,
+        updatedAt: date
+      },{},{},{
         _count: {
           bids: 0
         }
@@ -73,6 +77,11 @@ describe("createBid", () => {
     });
     expect(result).toMatchInlineSnapshot(`
       {
+        "data": {
+          "amount": 1001,
+          "id": "bid",
+          "updatedAt": 2000-02-01T06:00:00.000Z,
+        },
         "success": true,
       }
     `)

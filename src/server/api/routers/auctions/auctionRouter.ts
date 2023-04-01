@@ -9,7 +9,6 @@ import { uploadImg } from "~/utils/uploadImg";
 import { type Auction } from "@prisma/client";
 import { inngest } from "~/pages/api/inngest";
 import { AUCTION_STATUS, PUBLIC_STATUS } from "~/constants/auction";
-import { observable } from "@trpc/server/observable";
 
 export const auctionRouter = createTRPCRouter({
   createAuction: protectedProcedure

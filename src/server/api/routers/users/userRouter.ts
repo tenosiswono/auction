@@ -1,4 +1,3 @@
-import { type User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import {
