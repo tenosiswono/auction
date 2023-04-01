@@ -1,10 +1,9 @@
-import { Mock, describe, expect, vi } from "vitest";
+import { describe, expect, vi } from "vitest";
 import React from "react";
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { mockAllIsIntersecting } from "react-intersection-observer/test-utils";
 import AuctionList from "~/components/AuctionList";
 
-const mutateAsync = vi.fn();
 const mockUseInfiniteQuery = {
   data: {
     pages: [{

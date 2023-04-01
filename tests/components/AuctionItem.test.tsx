@@ -1,9 +1,8 @@
 import { describe, expect, vi } from "vitest";
 import React from "react";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import AuctionItem from "~/components/AuctionItem/AuctionItem";
 import { type GetAuctionResponse } from "~/server/api/routers/auctions/auctionRouter";
-import {api} from '~/utils/api'
 
 const mutateAsync = vi.fn();
 const mockPush = vi.fn();
