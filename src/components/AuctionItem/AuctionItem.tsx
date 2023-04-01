@@ -38,7 +38,8 @@ export default function AuctionItem(props: AuctionItemProps) {
           name: string | null;
         } | null;
       }) => {
-        const newAuction: GetAuctionResponse = auctionRef.current;
+        console.log('pusher debug:', data)
+        const newAuction: GetAuctionResponse = {...auctionRef.current};
         if (data.currentPrice) {
           newAuction.currentPrice = data.currentPrice;
         }

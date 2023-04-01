@@ -11,6 +11,7 @@ export default function DepositBallance() {
 
   useEffect(() => {
     const priv = privateChannel?.bind('update-deposit', (data: { deposit: number}) => {
+      console.log('pusher debug:', data)
       setBallance(data.deposit)
     })
     return () => {

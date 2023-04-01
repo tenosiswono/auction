@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { pusherServer } from "~/utils/pusher";
 import { type GetAuctionResponse } from "../auctions/auctionRouter";
+import { User } from "@prisma/client";
 
 export const bidRouter = createTRPCRouter({
   createBid: protectedProcedure
@@ -179,6 +180,7 @@ export const bidRouter = createTRPCRouter({
         updatedAt: Date;
         amount: number;
       };
+      const userUpdate = transactionResults[1] as User
       void pusherServer.trigger(
         "public-auction",
         `update-auction-${auctionUpdate.id}`,
@@ -187,6 +189,10 @@ export const bidRouter = createTRPCRouter({
           bids: auctionUpdate._count.bids,
         }
       );
+      void pusherServer.trigger(`private-user-${ctx.session.user.id}`, 'update-deposit', {
+        deposit: userUpdate.deposit
+      })
+
       return {
         success: true,
         data: bid,
