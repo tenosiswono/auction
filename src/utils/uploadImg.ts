@@ -1,14 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "~/env";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
 const supabase = createClient<any>(env.SUPABASE_URL, env.SUPABASE_KEY);
 
 export async function uploadImg(imageURI: string) {
   let imageUrl = "";
   const image = imageURI;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const imageName: string = uuidv4();
   const imageData = image.replace(/^data:image\/\w+;base64,/, "");
   const imageBuffer = Buffer.from(imageData, "base64");

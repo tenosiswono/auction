@@ -25,7 +25,7 @@ export default function SignIn() {
     resolver: zodResolver(validationSchema),
   });
   const { status } = useSession();
-  const { push } = useRouter();
+  const { push, query } = useRouter();
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -52,6 +52,14 @@ export default function SignIn() {
   return (
     <Layout title={"AuctionHive - Signin"}>
       <h1 className="mb-8 text-3xl font-bold">Login to your Account</h1>
+      {query.signup ? (
+        <div
+          className="mb-4 rounded-lg bg-green-50 p-4 text-sm text-green-800"
+          role="alert"
+        >
+          <span className="font-medium">You have successfully signed up!</span> To access your account, please login using the credentials you just created.
+        </div>
+      ) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-6">
           <label data-invalid={errors.email} className="form-label mb-2 block">
@@ -63,7 +71,7 @@ export default function SignIn() {
             type="email"
             id="email"
             className="form-input block w-full"
-            placeholder="name@flowbite.com"
+            placeholder="name@mail.com"
             required
             data-testid="input-email"
           />

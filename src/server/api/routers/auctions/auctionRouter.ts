@@ -39,6 +39,7 @@ export const auctionRouter = createTRPCRouter({
       await ctx.prisma.auction.create({
         data: {
           ...input,
+          status: AUCTION_STATUS.draft,
           image: imageUrl,
           creatorId: ctx.session.user.id,
           currentPrice: input.startingPrice,

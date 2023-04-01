@@ -1,6 +1,4 @@
-import { type GetServerSidePropsContext } from "next";
 import {
-  getServerSession,
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";

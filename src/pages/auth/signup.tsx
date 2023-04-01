@@ -47,7 +47,7 @@ export default function SignIn() {
         password: data.password,
       });
       if (res.success) {
-        await push("/");
+        await push("/auth/signin?signup=true");
       }
       reset();
     } catch (e) {
@@ -92,7 +92,7 @@ export default function SignIn() {
             type="email"
             id="email"
             className="form-input block w-full"
-            placeholder="name@flowbite.com"
+            placeholder="name@mail.com"
             required
             data-testid="input-email"
           />
