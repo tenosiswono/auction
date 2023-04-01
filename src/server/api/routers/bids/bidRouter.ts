@@ -133,6 +133,9 @@ export const bidRouter = createTRPCRouter({
           data: {
             deposit: user.deposit - amountDebit,
           },
+          select: {
+            deposit: true
+          }
         }),
         ctx.prisma.depositHistory.create({
           data: {
@@ -186,7 +189,14 @@ export const bidRouter = createTRPCRouter({
         `update-auction-${auctionUpdate.id}`,
         {
           currentPrice: auctionUpdate.currentPrice,
-          bids: auctionUpdate._count.bids,
+          countBids: auctionUpdate._count.bids,
+        }
+      );
+      void pusherServer.trigger(
+        `private-user-${ctx.session.user.id}`,
+        `update-auction-${auctionUpdate.id}`,
+        {
+          bids: auctionUpdate.bids,
         }
       );
       void pusherServer.trigger(`private-user-${ctx.session.user.id}`, 'update-deposit', {

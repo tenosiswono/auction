@@ -19,7 +19,7 @@ type AuctionItemProps = {
 export default function AuctionItem(props: AuctionItemProps) {
   const { data } = props;
   const { data: sessioData } = useSession();
-  const { publicChannel } = usePusher();
+  const { publicChannel, privateChannel } = usePusher();
   const [auction, setAuction] = useState(data);
   // auctionRef for subscription to work properly
   const auctionRef = useRef(data);
@@ -30,7 +30,7 @@ export default function AuctionItem(props: AuctionItemProps) {
       `update-auction-${auction.id}`,
       (data: {
         currentPrice?: number;
-        bids?: number;
+        countBids?: number;
         winnerId?: string;
         status?: string;
         winner?: {
@@ -43,8 +43,8 @@ export default function AuctionItem(props: AuctionItemProps) {
         if (data.currentPrice) {
           newAuction.currentPrice = data.currentPrice;
         }
-        if (data.bids) {
-          newAuction._count.bids = data.bids;
+        if (data.countBids) {
+          newAuction._count.bids = data.countBids;
         }
         if (data.winnerId) {
           newAuction.winnerId = data.winnerId;
@@ -63,6 +63,33 @@ export default function AuctionItem(props: AuctionItemProps) {
       pub?.unbind();
     };
   }, [auction.id, publicChannel]);
+
+  useEffect(() => {
+    const pub = privateChannel?.bind(
+      `update-auction-${auction.id}`,
+      (data: {
+        bids?:
+        | {
+            updatedAt: string;
+            amount: number;
+            bidderId: string;
+            id: string;
+          }[]
+        | undefined;
+      }) => {
+        console.log('pusher debug:', data)
+        const newAuction: GetAuctionResponse = {...auctionRef.current};
+        if (data.bids) {
+          newAuction.bids = data.bids.map(bid => ({ ...bid, updatedAt: new Date(bid.updatedAt)}));
+        }
+        auctionRef.current = newAuction;
+        setAuction(newAuction);
+      }
+    );
+    return () => {
+      pub?.unbind();
+    };
+  }, [auction.id, privateChannel]);
 
   useEffect(() => {
     setAuction(data);

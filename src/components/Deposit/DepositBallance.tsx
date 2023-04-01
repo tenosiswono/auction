@@ -14,6 +14,7 @@ export default function DepositBallance() {
       console.log('pusher debug:', data)
       setBallance(data.deposit)
     })
+    console.log(priv)
     return () => {
       priv?.unbind()
     }
