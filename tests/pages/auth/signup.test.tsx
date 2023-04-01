@@ -77,7 +77,7 @@ describe("Home", () => {
         name: "name",
         password: "password",
       });
-      expect(push).toHaveBeenCalledWith('/')
+      expect(push).toHaveBeenCalledWith('/auth/signin?signup=true')
     });
   });
 });

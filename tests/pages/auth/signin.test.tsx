@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react'
 vi.mock("next/router", () => ({
   useRouter: () => ({
     push: vi.fn(),
+    query: {}
   }),
 }));
 vi.mock("next-auth/react", () => ({
