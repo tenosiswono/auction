@@ -1,4 +1,4 @@
-# [AuctionHive](auction.teno.dev)
+# [AuctionHive](https://auction.teno.dev)
 
 Realtime Auction System
 
