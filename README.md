@@ -39,6 +39,10 @@ Edit the environment file and fill in coresponding `#inngest` env from [Inngest]
 INNGEST_EVENT_KEY="local"
 INNGEST_SIGNING_KEY=<your-signing-key>
 ```
+Migrate Prisma DB
+```bash
+npx prisma migrate dev
+```
 Start the web development server.
 ```bash
 npm run dev
@@ -47,6 +51,7 @@ Start the websocket development server.
 ```bash
 npm run dev:ws
 ```
+Open on your browser `http://localhost:3000`
 ## Test
 - [x] Frontend Unit Test
 - [x] Server Unit Test
