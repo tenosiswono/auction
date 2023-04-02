@@ -62,7 +62,7 @@ export default function Layout({
         <aside
           id="sidebar-multi-level-sidebar"
           data-open={open}
-          className="fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full transition-transform data-[open=false]:-translate-x-full data-[open=true]:transform-none sm:translate-x-0"
+          className="nav-sidebar"
           aria-label="Sidebar"
         >
           <div className="flex h-full flex-col overflow-y-auto bg-orange-50 p-4">

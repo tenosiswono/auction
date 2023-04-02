@@ -27,8 +27,16 @@
   .nav-item {
     @apply flex items-center rounded-lg p-2 text-gray-800 hover:bg-orange-100 data-[active=true]:bg-orange-200
   }
+  .nav-sidebar {
+    @apply fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full transition-transform data-[open=true]:transform-none data-[open=false]:-translate-x-full sm:translate-x-0
+  }
 }
-
+@media (min-width: 640px) {
+  .nav-sidebar {
+    --tw-translate-x: 0px !important;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))!important;
+  }
+}
 .main-container {
   background: url('/bg.svg') no-repeat;
   background-attachment: fixed;
