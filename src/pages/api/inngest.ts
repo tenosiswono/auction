@@ -85,7 +85,7 @@ export const finishAuction = inngest.createFunction(
                   })
                 ])
 
-                void pusherServer.trigger(`private-user-${bid.bidderId}`, 'update-deposit', {
+                void pusherServer.trigger(`private-user-deposit-${bid.bidderId}`, 'update-deposit', {
                   deposit: userUpdate.deposit
                 })
               }

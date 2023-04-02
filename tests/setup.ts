@@ -15,7 +15,7 @@ afterEach(() => {
 vi.mock("~/hooks/PusherProvider", () => ({
   usePusher: () => ({
     publicChannel: undefined,
-    privateChannel: undefined,
+    privateDepositChannel: undefined,
   }),
 }));
 vi.mock("~/utils/pusher", () => ({

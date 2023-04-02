@@ -11,7 +11,8 @@ import { env } from "~/env.mjs";
 import { useSession } from "next-auth/react";
 
 type PusherContextType = {
-  privateChannel?: Channel;
+  privateDepositChannel?: Channel;
+  privateBidsChannel?: Channel;
   publicChannel?: Channel;
 };
 
@@ -32,19 +33,24 @@ const PusherProvider = ({ children }: PusherProviderProps) => {
     }
   }, [])
   const { data: sessionData } = useSession();
-  const [privateChannel, setPrivateChannel] = useState<Channel | undefined>();
+  const [privateDepositChannel, setPrivateDepositChannel] = useState<Channel | undefined>();
+  const [privateBidsChannel, setPrivateBidsChannel] = useState<Channel | undefined>();
   const [publicChannel, setPublicChannel] = useState<Channel | undefined>();
   useEffect(() => {
     if (pusherClient.current) {
       pusherClient.current.connect();
       if (sessionData?.user.id) {
-        setPrivateChannel(
-          pusherClient.current.subscribe(`private-user-${sessionData.user.id}`)
+        setPrivateDepositChannel(
+          pusherClient.current.subscribe(`private-user-deposit-${sessionData.user.id}`)
+        );
+        setPrivateBidsChannel(
+          pusherClient.current.subscribe(`private-user-bids-${sessionData.user.id}`)
         );
       }
       setPublicChannel(pusherClient.current.subscribe(`public-auction`));
       return () => {
-        setPrivateChannel(undefined);
+        setPrivateDepositChannel(undefined);
+        setPrivateBidsChannel(undefined);
         setPublicChannel(undefined);
         pusherClient?.current?.disconnect();
       };
@@ -53,7 +59,8 @@ const PusherProvider = ({ children }: PusherProviderProps) => {
   return (
     <PusherContext.Provider
       value={{
-        privateChannel,
+        privateDepositChannel,
+        privateBidsChannel,
         publicChannel,
       }}
     >

@@ -5,12 +5,12 @@ import { usePusher } from "~/hooks/PusherProvider";
 
 export default function DepositBallance() {
   const [ballance, setBallance] = useState<number>(0);
-  const { privateChannel, publicChannel } = usePusher()
+  const { privateDepositChannel, publicChannel } = usePusher()
 
   const { data, isLoading } = api.user.getDepositBallance.useQuery();
 
   useEffect(() => {
-    const priv = privateChannel?.bind('update-deposit', (data: { deposit: number}) => {
+    const priv = privateDepositChannel?.bind('update-deposit', (data: { deposit: number}) => {
       console.log('pusher debug:', data)
       setBallance(data.deposit)
     })
@@ -18,7 +18,7 @@ export default function DepositBallance() {
     return () => {
       priv?.unbind()
     }
-  }, [privateChannel, publicChannel])
+  }, [privateDepositChannel, publicChannel])
   
   useEffect(() => {
     setBallance(data?.deposit || 0);
