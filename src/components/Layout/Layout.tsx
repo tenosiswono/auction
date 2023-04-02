@@ -2,7 +2,7 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import {
   TbHammer,
   TbHandStop,
@@ -24,6 +24,7 @@ export default function Layout({
 }) {
   const { data: sessionData, status } = useSession();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const onSignout = async () => {
     await signOut();
@@ -38,10 +39,8 @@ export default function Layout({
       </Head>
       <main>
         <button
-          data-drawer-target="sidebar-multi-level-sidebar"
-          data-drawer-toggle="sidebar-multi-level-sidebar"
-          aria-controls="sidebar-multi-level-sidebar"
           type="button"
+          onClick={() => setOpen(!open)}
           className="mt-2 ml-3 inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200  md:hidden"
         >
           <span className="sr-only">Open sidebar</span>
@@ -59,10 +58,11 @@ export default function Layout({
             ></path>
           </svg>
         </button>
-
+        {open ? <div onClick={() => setOpen(false)} className="bg-gray-900 bg-opacity-50 fixed inset-0 z-30"></div> : null}
         <aside
           id="sidebar-multi-level-sidebar"
-          className="fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full transition-transform sm:translate-x-0"
+          data-open={open}
+          className="fixed top-0 left-0 z-40 h-screen w-72 -translate-x-full transition-transform data-[open=false]:-translate-x-full data-[open=true]:transform-none sm:translate-x-0"
           aria-label="Sidebar"
         >
           <div className="flex h-full flex-col overflow-y-auto bg-orange-50 p-4">
