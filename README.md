@@ -92,11 +92,6 @@ npm run lint
 - [Vitest](https://vitest.dev/) Test Framework
 - [Pusher](https://pusher.com/) Websocket to handle realtime data
 
-BUG NOTE:
-```
-In production, there is a weird bug where websocket messages from Pusher are not received immediately (on the network tab). Instead, they are received when the window is refocused or when another action is taken.
-```
-
 ### ERD
 ```mermaid
 erDiagram
