@@ -184,7 +184,7 @@ export const bidRouter = createTRPCRouter({
         amount: number;
       };
       const userUpdate = transactionResults[1] as User
-      void pusherServer.trigger(
+      await pusherServer.trigger(
         "public-auction",
         `update-auction-${auctionUpdate.id}`,
         {
@@ -192,14 +192,14 @@ export const bidRouter = createTRPCRouter({
           countBids: auctionUpdate._count.bids,
         }
       );
-      void pusherServer.trigger(
+      await pusherServer.trigger(
         `private-user-bids-${ctx.session.user.id}`,
         `update-auction-${auctionUpdate.id}`,
         {
           bids: auctionUpdate.bids,
         }
       );
-      void pusherServer.trigger(`private-user-deposit-${ctx.session.user.id}`, 'update-deposit', {
+      await pusherServer.trigger(`private-user-deposit-${ctx.session.user.id}`, 'update-deposit', {
         deposit: userUpdate.deposit
       })
 

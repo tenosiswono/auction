@@ -32,7 +32,7 @@ export const depositRouter = createTRPCRouter({
         }),
       ]);
       
-      void pusherServer.trigger(`private-user-deposit-${ctx.session.user.id}`, 'update-deposit', {
+      await pusherServer.trigger(`private-user-deposit-${ctx.session.user.id}`, 'update-deposit', {
         deposit: user.deposit
       })
 

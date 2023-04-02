@@ -48,7 +48,7 @@ export const finishAuction = inngest.createFunction(
                     id: true,
                   }
                 })
-                void pusherServer.trigger(`public-auction`, `update-auction-${auction.id}`, {
+                await pusherServer.trigger(`public-auction`, `update-auction-${auction.id}`, {
                   winnerId: auction.winnerId,
                   status: auction.status,
                   winner: auction.winner
@@ -85,7 +85,7 @@ export const finishAuction = inngest.createFunction(
                   })
                 ])
 
-                void pusherServer.trigger(`private-user-deposit-${bid.bidderId}`, 'update-deposit', {
+                await pusherServer.trigger(`private-user-deposit-${bid.bidderId}`, 'update-deposit', {
                   deposit: userUpdate.deposit
                 })
               }
